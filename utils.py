@@ -5,8 +5,11 @@ import datetime
 import numpy as np
 import pandas as pd
 import shapely
+import matplotlib.pyplot as plt
+import shutil
 
-from configs import base_layers_configs, map_configs, x_lims_broader, y_lims_broader, data_path, scalarMap, scalarMap_time
+from configs import base_layers_configs, map_configs, x_lims_broader, y_lims_broader, data_path, scalarMap, \
+    scalarMap_time, base_layers_configs, x_lims, y_lims
 
 
 def timesince(time, percent_done):
@@ -563,7 +566,7 @@ def plotter_end_points_shrinking(inputs):
     return returns
 
 
-def which_layers_needed():
+def which_layers_needed(map_configs):
     all_layers = []
     for key, value in map_configs.items():
         if value['plotting_or_not']:
@@ -646,3 +649,73 @@ def get_speeds(lats, lngs, times):
 
     except Exception as e:
         print(e)
+
+
+def read_in_convert_base_maps(map_configs):
+
+    #
+    # CONSTRUCT THE BASE layers - read the data in, set the colours and convert to Mercator projections
+    #
+
+    # Find exactly which layers are needed, read them in
+    layers_to_read = which_layers_needed(map_configs)
+    base_layers = read_in_required_layers(layers_to_read)
+    # Convert required layers to Mercator projection, crop layers down
+    base_layers = convert_crop_base_map_layers(base_layers)
+    return base_layers
+
+def clear_out_old_folders_and_make_new(map_configs):
+
+    #
+    # CLEAR OUT THE images_for_video FOLDER
+    #
+
+    # Remove old folders
+    if len(os.listdir(os.path.join(data_path, 'images_for_video'))) > 0:
+        for folder in os.listdir(os.path.join(data_path, 'images_for_video')):
+            shutil.rmtree(os.path.join(os.path.join(data_path, 'images_for_video'), folder))
+
+    # Generate new folders
+    for key, item in map_configs.items():
+        if item['plotting_or_not']:
+            os.mkdir(os.path.join(os.path.join(data_path, 'images_for_video'), key))
+
+def plot_base_map_layers(map_configs, base_layers):
+
+    #
+    # PLOT THE BASE LAYERS
+    #
+
+    # Create maps_dict for storing the map objects in
+    maps_dict = {}
+    # Plot the base layers for all maps being made
+    for key, value in map_configs.items():
+        if value['plotting_or_not']:
+            print("")
+            fig, ax = plt.subplots(figsize=(14 * 2, 6 * 2))
+            ax.set_xlim(x_lims[0], x_lims[1])
+            ax.set_ylim(y_lims[0], y_lims[1])
+            x_axis = ax.axes.get_xaxis()
+            x_axis.set_visible(False)
+            y_axis = ax.axes.get_yaxis()
+            y_axis.set_visible(False)
+            if key in ['dark', 'dark_colours_by_time']:
+                print('Plotting ' + 'tidal_water' + ' for ' + key)
+                ax.set_facecolor(tuple([x / 255 for x in [0, 0, 0]]))
+                maps_dict[key] = [fig, ax, x_axis, y_axis]
+                base_layers['tidal_water'].plot(categorical=False,
+                                                legend=False,
+                                                ax=maps_dict[key][1],
+                                                color=tuple([x / 255 for x in [0, 0, 60]]),
+                                                zorder=0)
+            else:
+                for layer in value['layers']:
+                    print('Plotting ' + layer + ' for ' + key)
+                    ax.set_facecolor(tuple([x / 255 for x in [232, 237, 232]]))
+                    maps_dict[key] = [fig, ax, x_axis, y_axis]
+                    base_layers[layer].plot(categorical=False,
+                                            legend=False,
+                                            ax=maps_dict[key][1],
+                                            color=base_layers_configs[layer][1],
+                                            zorder=0)
+    return maps_dict

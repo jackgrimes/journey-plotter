@@ -19,7 +19,7 @@ dark_colours_by_time = False
 overall_shrinking = False
 overall_bubbling_off = False
 end_points = False
-end_points_shrinking = True
+end_points_shrinking = False
 end_points_bubbling = True
 
 # Paths
@@ -169,11 +169,11 @@ map_configs = {'overall': {'layers': ['roads',
                                         'plotting_or_not': end_points_shrinking,
                                         'final_figure_output': 'final_output',
                                         'year_text': 'black'},
-               'end_points_bubbling': {'layers': ['roads',
-                                                  'water',
-                                                  'tidal_water',
-                                                  'building',
-                                                  'parks'
+               'end_points_bubbling': {'layers': [#'roads',
+                                                  #'water',
+                                                  'tidal_water'
+                                                  #'building',
+                                                  #'parks'
                                                   ],
                                        'which_journeys': 'all_journeys',
                                        'plotting_or_not': end_points_bubbling,
