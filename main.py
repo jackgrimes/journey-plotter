@@ -256,7 +256,7 @@ def run():
     print("")
     print("Saving the final images...")
     for key, value in map_configs.items():
-        if (value['final_figure_output'] == 'final_output') and value['plotting_or_not']:
+        if value['final_figure_output'] and value['plotting_or_not']:
             filename = os.path.join(os.path.join(data_path, 'results'),
                                     runstr + '_' + key + '__first_' + str(n_journeys_plotted) + '_journeys.png')
             maps_dict[key][0].savefig(filename, bbox_inches='tight', ax=maps_dict[key][1])
