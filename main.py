@@ -252,6 +252,12 @@ def run():
             unparsable_files.append(journey)
             n_journeys_attempted += 1
 
+    # Save the final by_year image - done separately to the other image formats below, due to the difference in filename
+    if map_configs['by_year']['plotting_or_not']:
+        filename = os.path.join('results', runstr + '_cycling_in_year_' + journey_year + '.png')
+        maps_dict['by_year'][0].savefig(filename, bbox_inches='tight', ax=maps_dict['by_year'][
+            1])  # Output the by_year maps at the end of the year
+
     # Save the final images
     print("")
     print("Saving the final images...")
