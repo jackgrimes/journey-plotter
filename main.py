@@ -394,7 +394,7 @@ def run():
 
             for i in range(number_plots_to_do):
                 print('HA! Additional figure generation: making additional image ' + str(index + 1) + ' of ' + str(
-                    number_plots_to_do) + ' for the shrinking video - shrinking the old journeys')
+                    number_plots_to_do) + ' for the end_points_shrinking video - shrinking the old journeys')
 
                 for points in end_points_shrinking:
                     if points._sizes > min_size:

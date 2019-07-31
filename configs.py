@@ -6,20 +6,21 @@ import matplotlib.colors as colors
 import sys
 
 os.environ[
-    "PROJ_LIB"] = os.path.join(os.path.join(sys.executable.strip(r'\\python.exe'), 'Library'), 'share')  # needed to add this line when using conda environments
+    "PROJ_LIB"] = os.path.join(os.path.join(sys.executable.strip(r'\\python.exe'), 'Library'),
+                               'share')  # needed to add this line when using conda environments
 
 # Set which maps you want to create
-overall = False
-running_recents = False
-dark = False
-overall_alpha_1 = False
-by_year = False
-overall_thick = False
-dark_colours_by_time = False
-overall_shrinking = False
-overall_bubbling_off = False
-end_points = False
-end_points_shrinking = False
+overall = True
+running_recents = True
+dark = True
+overall_alpha_1 = True
+by_year = True
+overall_thick = True
+dark_colours_by_time = True
+overall_shrinking = True
+overall_bubbling_off = True
+end_points = True
+end_points_shrinking = True
 end_points_bubbling = True
 
 # Paths
@@ -73,7 +74,7 @@ map_configs = {'overall': {'layers': ['roads',
                                       'water',
                                       'tidal_water',
                                       'building',
-                                      'parks'
+                                      'parks',
                                       ],
                            'which_journeys': 'all_journeys',
                            'plotting_or_not': overall,
@@ -83,7 +84,7 @@ map_configs = {'overall': {'layers': ['roads',
                                               'water',
                                               'tidal_water',
                                               'building',
-                                              'parks'
+                                              'parks',
                                               ],
                                    'which_journeys': 'most_recent_journeys',
                                    'plotting_or_not': running_recents,
@@ -99,21 +100,21 @@ map_configs = {'overall': {'layers': ['roads',
                                         'plotting_or_not': dark_colours_by_time,
                                         'final_figure_output': 'final_output',
                                         'year_text': 'dimgrey'},
-               'overall_alpha_1': {'layers': [  # 'roads',
-                   'water',
-                   'tidal_water',
-                   'building',
-                   'parks'
-               ],
-                   'which_journeys': 'all_journeys',
-                   'plotting_or_not': overall_alpha_1,
-                   'final_figure_output': 'final_output',
-                   'year_text': 'black'},
+               'overall_alpha_1': {'layers': ['roads',
+                                              'water',
+                                              'tidal_water',
+                                              'building',
+                                              'parks',
+                                              ],
+                                   'which_journeys': 'all_journeys',
+                                   'plotting_or_not': overall_alpha_1,
+                                   'final_figure_output': 'final_output',
+                                   'year_text': 'black'},
                'by_year': {'layers': ['roads',
                                       'water',
                                       'tidal_water',
                                       'building',
-                                      'parks'
+                                      'parks',
                                       ],
                            'which_journeys': 'all_journeys',
                            'plotting_or_not': by_year,
@@ -123,7 +124,7 @@ map_configs = {'overall': {'layers': ['roads',
                                             'water',
                                             'tidal_water',
                                             'building',
-                                            'parks'
+                                            'parks',
                                             ],
                                  'which_journeys': 'all_journeys',
                                  'plotting_or_not': overall_thick,
@@ -133,7 +134,7 @@ map_configs = {'overall': {'layers': ['roads',
                                                 'water',
                                                 'tidal_water',
                                                 'building',
-                                                'parks'
+                                                'parks',
                                                 ],
                                      'which_journeys': 'all_journeys',
                                      'plotting_or_not': overall_shrinking,
@@ -143,7 +144,7 @@ map_configs = {'overall': {'layers': ['roads',
                                                    'water',
                                                    'tidal_water',
                                                    'building',
-                                                   'parks'
+                                                   'parks',
                                                    ],
                                         'which_journeys': 'all_journeys',
                                         'plotting_or_not': overall_bubbling_off,
@@ -153,7 +154,7 @@ map_configs = {'overall': {'layers': ['roads',
                                          'water',
                                          'tidal_water',
                                          'building',
-                                         'parks'
+                                         'parks',
                                          ],
                               'which_journeys': 'all_journeys',
                               'plotting_or_not': end_points,
@@ -163,17 +164,17 @@ map_configs = {'overall': {'layers': ['roads',
                                                    'water',
                                                    'tidal_water',
                                                    'building',
-                                                   'parks'
+                                                   'parks',
                                                    ],
                                         'which_journeys': 'all_journeys',
                                         'plotting_or_not': end_points_shrinking,
                                         'final_figure_output': 'final_output',
                                         'year_text': 'black'},
-               'end_points_bubbling': {'layers': [#'roads',
-                                                  #'water',
-                                                  'tidal_water'
-                                                  #'building',
-                                                  #'parks'
+               'end_points_bubbling': {'layers': ['roads',
+                                                  'water',
+                                                  'tidal_water',
+                                                  'building',
+                                                  'parks',
                                                   ],
                                        'which_journeys': 'all_journeys',
                                        'plotting_or_not': end_points_bubbling,
