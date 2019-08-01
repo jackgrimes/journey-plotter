@@ -10,18 +10,18 @@ os.environ[
                                'share')  # needed to add this line when using conda environments
 
 # Set which maps you want to create
-overall = False
-running_recents = False
-dark = False
-overall_alpha_1 = False
+overall = True
+running_recents = True
+dark = True
+overall_alpha_1 = True
 by_year = True
-overall_thick = False
-dark_colours_by_time = False
-overall_shrinking = False
-overall_bubbling_off = False
-end_points = False
-end_points_shrinking = False
-end_points_bubbling = False
+overall_thick = True
+dark_colours_by_time = True
+overall_shrinking = True
+overall_bubbling_off = True
+end_points = True
+end_points_shrinking = True
+end_points_bubbling = True
 
 # Paths
 data_path = 'C:\dev\data\journey_plotter'
@@ -110,11 +110,11 @@ map_configs = {'overall': {'layers': ['roads',
                                    'plotting_or_not': overall_alpha_1,
                                    'final_figure_output': True,
                                    'year_text': 'black'},
-               'by_year': {'layers': [#'roads',
-                                      #'water',
+               'by_year': {'layers': ['roads',
+                                      'water',
                                       'tidal_water',
-                                      #'building',
-                                      #'parks',
+                                      'building',
+                                      'parks',
                                       ],
                            'which_journeys': 'all_journeys',
                            'plotting_or_not': by_year,
