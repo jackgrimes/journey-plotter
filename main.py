@@ -154,7 +154,7 @@ def run():
                     if new_journey_year != journey_year:
                         journey_year_change = True
                         if map_configs['by_year']['plotting_or_not']:
-                            filename = os.path.join('results', runstr + '_cycling_in_year_' + journey_year + '.png')
+                            filename = os.path.join(os.path.join(data_path, 'results'), runstr + '_cycling_in_year_' + journey_year + '.png')
                             maps_dict['by_year'][0].savefig(filename, bbox_inches='tight', ax=maps_dict['by_year'][
                                 1])  # Output the by_year maps at the end of the year
 
