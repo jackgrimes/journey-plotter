@@ -54,7 +54,7 @@ def run():
     journeys = sorted(
         [
             x
-            for x in os.listdir(r"C:\dev\data\journey_plotter\cycling_data")
+            for x in os.listdir(os.path.join(data_path, "cycling_data"))
             if ".gpx" in x
         ]
     )
