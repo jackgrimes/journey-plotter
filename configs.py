@@ -5,9 +5,11 @@ import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import sys
 
+debug_running = True
+
 os.environ["PROJ_LIB"] = os.path.join(
     os.path.join(sys.executable.strip(r"\\python.exe"), "Library"), "share"
-)  # needed to add this line when using conda environments
+)  # needed to add this line when using conda environments  
 
 # Set which maps you want to create
 overall = True
@@ -22,6 +24,23 @@ overall_bubbling_off = True
 end_points = True
 end_points_shrinking = True
 end_points_bubbling = True
+
+
+if debug_running:
+    # Set which maps you want to create
+    overall = False
+    running_recents = False
+    dark = True
+    overall_alpha_1 = False
+    by_year = False
+    overall_thick = False
+    dark_colours_by_time = False
+    overall_shrinking = False
+    overall_bubbling_off = False
+    end_points = False
+    end_points_shrinking = False
+    end_points_bubbling = False
+    
 
 # Paths
 data_path = "C:\dev\data\journey_plotter"
