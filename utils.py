@@ -100,6 +100,9 @@ def make_video(which_set_of_images, runstr, n_journeys_plotted):
         if f.endswith(ext):
             images.append(f)
 
+    # Make sure images are in right order
+    images = sorted(images)
+
     # Determine the width and height from the first image
     image_path = os.path.join(dir_path, images[0])
     frame = cv2.imread(image_path)
