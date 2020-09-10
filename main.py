@@ -52,11 +52,7 @@ def run():
     #
 
     journeys = sorted(
-        [
-            x
-            for x in os.listdir(os.path.join(data_path, "cycling_data"))
-            if ".gpx" in x
-        ]
+        [x for x in os.listdir(os.path.join(data_path, "cycling_data")) if ".gpx" in x]
     )
 
     no_journeys = input("How many journeys to include? Simply ENTER to attempt all")
@@ -106,9 +102,7 @@ def run():
         if value["plotting_or_not"]:
             filename = os.path.join(
                 os.path.join(os.path.join(data_path, "images_for_video"), key),
-                "cycling_locations_first_"
-                + str(n_journeys_plotted).zfill(4)
-                + "_journeys.png",
+                "first_" + str(n_journeys_plotted).zfill(4) + "_journeys.png",
             )
 
             timestr = first_year + " - " + journeys[0].split("-")[0]
