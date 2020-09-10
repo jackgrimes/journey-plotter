@@ -766,7 +766,7 @@ def get_speeds(lats, lngs, times):
     try:
         df = pd.DataFrame({"x": lngs, "y": lats, "times": times})
         df = pd.concat([df.shift(2), df.shift(-2)], axis=1)
-        df.columns = ["time1", "x1", "y1", "time2", "x2", "y2"]
+        df.columns = ["x1", "y1", "time1", "x2", "y2", "time2"]
 
         for coordinate_variable in ["x1", "y1", "x2", "y2"]:
             df[coordinate_variable + "_rad"] = np.deg2rad(df[coordinate_variable])
@@ -790,7 +790,6 @@ def get_speeds(lats, lngs, times):
                 ** 0.5
             )
         )
-
         df["speed"] = df["distance"] / (df["time2"] - df["time1"])
 
         # Remove values at the ends, replace them with uniform acceleration to and from 0
