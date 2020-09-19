@@ -10,7 +10,7 @@
 import datetime
 import time
 
-from configs import MAP_CONFIGS
+from configs import MAP_CONFIGS, MAP_CONFIGS_NO_BASE_LAYERS
 from utils import (
     read_in_convert_base_maps,
     clear_out_old_folders_and_make_new,
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     args = parse_the_args()
 
-    map_configs = MAP_CONFIGS
+    map_configs = MAP_CONFIGS_NO_BASE_LAYERS
 
     if args.is_debug:
         for k, v in map_configs.items():

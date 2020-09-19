@@ -778,6 +778,10 @@ def get_speeds(lats, lngs, times):
     """From a gpx file with name journey_name, get a numpy array of estimated speeds at each of those points"""
     try:
         df = pd.DataFrame({"x": lngs, "y": lats, "times": times})
+
+        # needed to prevent df columns being in different order on linux vs windows?
+        df = df[["x", "y", "times"]]
+
         df = pd.concat([df.shift(2), df.shift(-2)], axis=1)
         df.columns = ["x1", "y1", "time1", "x2", "y2", "time2"]
 
