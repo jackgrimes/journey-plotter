@@ -8,7 +8,6 @@
 # todo: replace all prints with logger
 
 import datetime
-import time
 
 from configs import MAP_CONFIGS, MAP_CONFIGS_NO_BASE_LAYERS
 from utils import (
@@ -52,7 +51,7 @@ def run(no_journeys, map_configs):
         journey_files
     )
 
-    timestr = make_first_frames(
+    timestr, timestr_moving_recents, text_vars = make_first_frames(
         counters, journey_files, text_vars, maps_dict, map_configs
     )
 
@@ -61,7 +60,6 @@ def run(no_journeys, map_configs):
         attempting_all,
         no_journeys,
         start_time,
-        time,
         maps_dict,
         runstr,
         text_vars,

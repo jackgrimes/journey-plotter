@@ -36,7 +36,7 @@ red = False
 # Making the videos or only the final images?
 making_videos = True
 
-# Set area of interest
+# Set area of interest - currently set to London
 x_lims = (-25400, 3400)
 y_lims = (6667500, 6686000)
 
