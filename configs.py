@@ -6,9 +6,8 @@ import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import numpy as np
 
-os.environ["PROJ_LIB"] = os.path.join(
-    os.path.join(sys.executable.strip(r"\\python.exe"), "Library"), "share"
-)  # needed to add this line when using conda environments
+# needed to add this line when using conda environments
+os.environ["PROJ_LIB"] = os.path.join( os.path.dirname(os.path.dirname(sys.executable)), "share", "proj")
 
 # Set which maps you want to create
 overall = False
@@ -38,7 +37,7 @@ making_videos = True
 
 # Set area of interest - currently set to London
 x_lims = (-25400, 3400)
-y_lims = (6667500, 6686000)
+y_lims = (6667500, 6687221)
 
 x_lims_broader = tuple(np.mean(x_lims) + ((x_lims - np.mean(x_lims)) * 2))
 y_lims_broader = tuple(np.mean(y_lims) + ((y_lims - np.mean(y_lims)) * 2))
