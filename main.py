@@ -9,7 +9,7 @@
 
 import datetime
 
-from configs import MAP_CONFIGS, MAP_CONFIGS_NO_BASE_LAYERS
+from configs import MAP_CONFIGS
 from utils import (
     read_in_convert_base_maps,
     clear_out_old_folders_and_make_new,
@@ -25,7 +25,6 @@ from utils import (
     clear_out_images_for_video_folder,
     overall_run_notes,
     set_up_plot_lists_and_counters,
-    configure_logger,
 )
 
 
@@ -36,8 +35,6 @@ from utils import (
 def run(no_journeys, map_configs):
 
     overall_start_time, runstr = get_start_time()
-
-    logger = configure_logger(runstr)
 
     journey_files, no_journeys, attempting_all = get_journey_files(no_journeys)
 
@@ -97,7 +94,7 @@ if __name__ == "__main__":
 
     args = parse_the_args()
 
-    map_configs = MAP_CONFIGS_NO_BASE_LAYERS
+    map_configs = MAP_CONFIGS
 
     if args.is_debug:
         for k, v in map_configs.items():

@@ -11,21 +11,21 @@ os.environ["PROJ_LIB"] = os.path.join(
 )  # needed to add this line when using conda environments
 
 # Set which maps you want to create
-overall = True
-running_recents = True
-dark = True
+overall = False
+running_recents = False
+dark = False
 overall_alpha_1 = True
-by_year = True
-overall_thick = True
-dark_colours_by_time = True
+by_year = False
+overall_thick = False
+dark_colours_by_time = False
 overall_shrinking = True
-overall_bubbling_off = True
-end_points = True
-end_points_shrinking = True
-end_points_bubbling = True
+overall_bubbling_off = False
+end_points = False
+end_points_shrinking = False
+end_points_bubbling = False
 
 # Paths
-data_path = "C:\dev\data\journey_plotter"
+data_path = "/home/jack/dev/data/journey-plotter"
 
 # Colour scheme for journeys?
 
@@ -184,63 +184,63 @@ MAP_CONFIGS_NO_BASE_LAYERS = {
         "year_text": "dimgrey",
     },
     "dark_colours_by_time": {
-        "layers": ["tidal_water"],
+        "layers": [],
         "which_journeys": "all_journeys",
         "plotting_or_not": dark_colours_by_time,
         "final_figure_output": True,
         "year_text": "dimgrey",
     },
     "overall_alpha_1": {
-        "layers": ["tidal_water"],
+        "layers": [],
         "which_journeys": "all_journeys",
         "plotting_or_not": overall_alpha_1,
         "final_figure_output": True,
         "year_text": "black",
     },
     "by_year": {
-        "layers": ["tidal_water"],
+        "layers": [],
         "which_journeys": "all_journeys",
         "plotting_or_not": by_year,
         "final_figure_output": False,
         "year_text": "black",
     },
     "overall_thick": {
-        "layers": ["tidal_water"],
+        "layers": [],
         "which_journeys": "all_journeys",
         "plotting_or_not": overall_thick,
         "final_figure_output": True,
         "year_text": "black",
     },
     "overall_shrinking": {
-        "layers": ["tidal_water"],
+        "layers": [],
         "which_journeys": "all_journeys",
         "plotting_or_not": overall_shrinking,
         "final_figure_output": True,
         "year_text": "black",
     },
     "overall_bubbling_off": {
-        "layers": ["tidal_water"],
+        "layers": [],
         "which_journeys": "all_journeys",
         "plotting_or_not": overall_bubbling_off,
         "final_figure_output": True,
         "year_text": "black",
     },
     "end_points": {
-        "layers": ["tidal_water"],
+        "layers": [],
         "which_journeys": "all_journeys",
         "plotting_or_not": end_points,
         "final_figure_output": True,
         "year_text": "black",
     },
     "end_points_shrinking": {
-        "layers": ["tidal_water"],
+        "layers": [],
         "which_journeys": "all_journeys",
         "plotting_or_not": end_points_shrinking,
         "final_figure_output": True,
         "year_text": "black",
     },
     "end_points_bubbling": {
-        "layers": ["tidal_water"],
+        "layers": [],
         "which_journeys": "all_journeys",
         "plotting_or_not": end_points_bubbling,
         "final_figure_output": True,

@@ -33,6 +33,11 @@ from configs import (
     scalarMap,
 )
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s",
+    datefmt="%Y-%d %H:%M:%S",
+)
 logger = logging.getLogger(__name__)
 
 
@@ -717,7 +722,7 @@ def which_layers_needed(map_configs):
 def read_in_required_layers(layers_to_read):
     base_layers = {}
     for layer_to_read in layers_to_read:
-        print("Reading in " + layer_to_read + " map")
+        logger.info("Reading in " + layer_to_read + " map")
         try:
             base_layers[layer_to_read] = gpd.read_file(
                 os.path.join(
@@ -760,18 +765,27 @@ plotter_functions_dict = {
 
 def convert_crop_base_map_layers(base_layers):
     """Crop the base_map_layers to the London area"""
-    print("")
+
+    lims_gs = gpd.GeoSeries(
+        [
+            shapely.geometry.Point(x_lims_broader[0], y_lims_broader[0]),
+            shapely.geometry.Point(x_lims_broader[0], y_lims_broader[1]),
+            shapely.geometry.Point(x_lims_broader[1], y_lims_broader[0]),
+            shapely.geometry.Point(x_lims_broader[1], y_lims_broader[1]),
+        ]
+    )
+    lims_gs = lims_gs.set_crs("epsg:3395")
+    lims_gs = lims_gs.to_crs("epsg:27700")
+
+    lims = list(lims_gs.total_bounds)
+
     for key, value in base_layers.items():
-        print("Converting coordinates in " + key)
-        value["geometry"] = (
-            value["geometry"]
-            .to_crs({"init": "epsg:3395"})
-            .cx[
-                x_lims_broader[0] : x_lims_broader[1],
-                y_lims_broader[0] : y_lims_broader[1],
-            ]
-        )  # Mercator
-        print("Cropping " + key + " layer to London area")
+        logger.info("Cropping " + key + " layer to London area")
+        value = value.cx[
+            lims[0] : lims[2], lims[1] : lims[3],
+        ]
+        logger.info("Converting coordinates in " + key)
+        value["geometry"] = value["geometry"].to_crs("epsg:3395")  # Mercator
     return base_layers
 
 
@@ -1308,7 +1322,7 @@ def make_final_by_year_image(runstr, counters, maps_dict, map_configs):
         )  # Output the by_year maps at the end of the year
 
     # Save the final images
-    logger.log("Saving the final images...")
+    logger.info("Saving the final images...")
     for map_scheme_name, map_scheme_configs in map_configs.items():
         if (
             map_scheme_configs["final_figure_output"]
