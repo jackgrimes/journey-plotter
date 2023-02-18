@@ -1198,8 +1198,8 @@ def increment_counters_for_unplotted_journeys(
 
 
 def handle_problem_parsing_gpx_file(e, counters, journey):
-    logger.log("Problem parsing " + (os.path.join("cycling_data", journey)))
-    logger.log(e)
+    logger.info("Problem parsing " + (os.path.join("cycling_data", journey)))
+    logger.info(e)
     counters["n_files_unparsable"] += 1
     counters["unparsable_files"].append(journey)
     counters["n_journeys_attempted"] += 1
