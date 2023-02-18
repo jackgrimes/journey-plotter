@@ -781,11 +781,11 @@ def convert_crop_base_map_layers(base_layers):
 
     for key, value in base_layers.items():
         logger.info("Cropping " + key + " layer to London area")
-        value = value.cx[
+        base_layers[key] = base_layers[key].cx[
             lims[0] : lims[2], lims[1] : lims[3],
         ]
         logger.info("Converting coordinates in " + key)
-        value["geometry"] = value["geometry"].to_crs("epsg:3395")  # Mercator
+        base_layers[key]["geometry"] = base_layers[key]["geometry"].to_crs("epsg:3395")  # Mercator
     return base_layers
 
 
@@ -889,11 +889,11 @@ def plot_base_map_layers(base_layers, map_configs):
             x_axis.set_visible(False)
             y_axis = ax.axes.get_yaxis()
             y_axis.set_visible(False)
-            if key in ["dark", "dark_colours_by_time"] and ("tidal" in value["layers"]):
+            if key in ["dark", "dark_colours_by_time"] and ("tidal_water" in value["layers"]):
                 print("Plotting " + "tidal_water" + " for " + key)
                 ax.set_facecolor(tuple([x / 255 for x in [0, 0, 0]]))
                 maps_dict[key] = [fig, ax, x_axis, y_axis]
-                base_layers["tidal_water"].plot(
+                maps_dict[key][1] = base_layers["tidal_water"].plot(
                     categorical=False,
                     legend=False,
                     ax=maps_dict[key][1],
@@ -905,7 +905,7 @@ def plot_base_map_layers(base_layers, map_configs):
                     print("Plotting " + layer + " for " + key)
                     ax.set_facecolor(tuple([x / 255 for x in [232, 237, 232]]))
                     maps_dict[key] = [fig, ax, x_axis, y_axis]
-                    base_layers[layer].plot(
+                    maps_dict[key][1] = base_layers[layer].plot(
                         categorical=False,
                         legend=False,
                         ax=maps_dict[key][1],
@@ -991,8 +991,6 @@ def make_first_frames(counters, journeys, text_vars, maps_dict, map_configs):
             maps_dict[map_scheme_name][0].savefig(
                 filename,
                 bbox_inches="tight",
-                fig=maps_dict[map_scheme_name][0],
-                ax=maps_dict[map_scheme_name][1],
             )
 
     return timestr, timestr_moving_recents, text_vars
@@ -1063,8 +1061,8 @@ def convert_to_gdf(track):
     speeds = get_speeds(lats, lngs, times)
 
     new_points = [shapely.geometry.Point(xy) for xy in zip(lngs, lats)]
-    new_point_gdf = gpd.GeoDataFrame(crs={"init": "epsg:4326"}, geometry=new_points)
-    new_point_gdf = new_point_gdf.to_crs(crs={"init": "epsg:3395"})
+    new_point_gdf = gpd.GeoDataFrame(crs="epsg:4326", geometry=new_points)
+    new_point_gdf = new_point_gdf.to_crs(crs="epsg:3395")
 
     return new_point_gdf, speeds
 
@@ -1162,8 +1160,6 @@ def save_frames_for_video(making_videos, counters, maps_dict, map_scheme_name):
             maps_dict[map_scheme_name][0].savefig(
                 filename,
                 bbox_inches="tight",
-                fig=maps_dict[map_scheme_name][0],
-                ax=maps_dict[map_scheme_name][1],
             )
 
 
@@ -1338,7 +1334,7 @@ def make_final_by_year_image(runstr, counters, maps_dict, map_configs):
                 + "_journeys.png",
             )
             maps_dict[map_scheme_name][0].savefig(
-                filename, bbox_inches="tight", ax=maps_dict[map_scheme_name][1]
+                filename, bbox_inches="tight",
             )
 
 
