@@ -785,7 +785,9 @@ def convert_crop_base_map_layers(base_layers):
             lims[0] : lims[2], lims[1] : lims[3],
         ]
         logger.info("Converting coordinates in " + key)
-        base_layers[key]["geometry"] = base_layers[key]["geometry"].to_crs("epsg:3395")  # Mercator
+        base_layers[key]["geometry"] = base_layers[key]["geometry"].to_crs(
+            "epsg:3395"
+        )  # Mercator
     return base_layers
 
 
@@ -889,8 +891,10 @@ def plot_base_map_layers(base_layers, map_configs):
             x_axis.set_visible(False)
             y_axis = ax.axes.get_yaxis()
             y_axis.set_visible(False)
-            if key in ["dark", "dark_colours_by_time"] and ("tidal_water" in value["layers"]):
-                print("Plotting " + "tidal_water" + " for " + key)
+            if key in ["dark", "dark_colours_by_time"] and (
+                "tidal_water" in value["layers"]
+            ):
+                logger.info(f"Plotting tidal_water for {key}")
                 ax.set_facecolor(tuple([x / 255 for x in [0, 0, 0]]))
                 maps_dict[key] = [fig, ax, x_axis, y_axis]
                 maps_dict[key][1] = base_layers["tidal_water"].plot(
@@ -902,7 +906,7 @@ def plot_base_map_layers(base_layers, map_configs):
                 )
             else:
                 for layer in value["layers"]:
-                    print("Plotting " + layer + " for " + key)
+                    logger.info(f"Plotting {layer} for {key}")
                     ax.set_facecolor(tuple([x / 255 for x in [232, 237, 232]]))
                     maps_dict[key] = [fig, ax, x_axis, y_axis]
                     maps_dict[key][1] = base_layers[layer].plot(
@@ -989,8 +993,7 @@ def make_first_frames(counters, journeys, text_vars, maps_dict, map_configs):
                 )
 
             maps_dict[map_scheme_name][0].savefig(
-                filename,
-                bbox_inches="tight",
+                filename, bbox_inches="tight",
             )
 
     return timestr, timestr_moving_recents, text_vars
@@ -998,45 +1001,32 @@ def make_first_frames(counters, journeys, text_vars, maps_dict, map_configs):
 
 def print_update(attempting_all, counters, no_journeys, start_time):
     if attempting_all:
-        print(
-            "\nAttempting to plot journey number {} of {} ({}% done)".format(
-                str(counters["n_journeys_attempted"] + 1),
-                str(no_journeys),
-                str(round(100 * counters["n_journeys_attempted"] / no_journeys, 2)),
-            )
+        logger.info(
+            f"Attempting to plot journey number {counters['n_journeys_attempted'] + 1} of {no_journeys} "
+            f"({round(100 * counters['n_journeys_attempted'] / no_journeys, 2)}% done)"
         )
-        print(
-            "{} journeys were plotted successfully, {} journeys were unparsable, {} journeys were not cycling, {} "
-            "journeys started outside London".format(
-                str(counters["n_journeys_plotted"]),
-                str(counters["n_files_unparsable"]),
-                str(counters["n_non_cycling_activities"]),
-                str(counters["n_journeys_outside_London"]),
-            )
+        logger.info(
+            f"{counters['n_journeys_plotted']} journeys were plotted successfully, {counters['n_files_unparsable']}"
+            f"journeys were unparsable, {counters['n_non_cycling_activities']} journeys were not cycling, "
+            f"{counters['n_journeys_outside_London']} journeys started outside London"
         )
-        print(
+        logger.info(
             timesince(start_time, 100 * counters["n_journeys_attempted"] / no_journeys)
         )
     else:
-        print(
-            "\nAttempting to plot journey number {} of {} ({}% done)".format(
-                str(counters["n_journeys_plotted"] + 1),
-                str(no_journeys),
-                str(round(100 * counters["n_journeys_plotted"] / no_journeys, 2)),
-            )
+        logger.info(
+            f"Attempting to plot journey number {counters['n_journeys_plotted'] + 1} of {no_journeys} "
+            f"({round(100 * counters['n_journeys_plotted'] / no_journeys, 2)}% done)"
         )
-        print(
-            "{} journeys were plotted successfully, "
-            "{} journeys were unparsable, "
-            "{} journeys were not cycling, "
-            "{} journeys started outside London".format(
-                str(counters["n_journeys_plotted"]),
-                str(counters["n_files_unparsable"]),
-                str(counters["n_non_cycling_activities"]),
-                str(counters["n_journeys_outside_London"]),
-            )
+        logger.info(
+            f"{counters['n_journeys_plotted']} journeys were plotted successfully, "
+            f"{counters['n_files_unparsable']} journeys were unparsable, "
+            f"{counters['n_non_cycling_activities']} journeys were not cycling, "
+            f"{counters['n_journeys_outside_London']} journeys started outside London"
         )
-        print(timesince(start_time, 100 * counters["n_journeys_plotted"] / no_journeys))
+        logger.info(
+            timesince(start_time, 100 * counters["n_journeys_plotted"] / no_journeys)
+        )
 
 
 def get_track(data_path, journey):
@@ -1158,8 +1148,7 @@ def save_frames_for_video(making_videos, counters, maps_dict, map_scheme_name):
                 + "_journeys.png",
             )
             maps_dict[map_scheme_name][0].savefig(
-                filename,
-                bbox_inches="tight",
+                filename, bbox_inches="tight",
             )
 
 
