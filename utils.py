@@ -1006,7 +1006,7 @@ def print_update(attempting_all, counters, no_journeys, start_time):
             f"({round(100 * counters['n_journeys_attempted'] / no_journeys, 2)}% done)"
         )
         logger.info(
-            f"{counters['n_journeys_plotted']} journeys were plotted successfully, {counters['n_files_unparsable']}"
+            f"{counters['n_journeys_plotted']} journeys were plotted successfully, {counters['n_files_unparsable']} "
             f"journeys were unparsable, {counters['n_non_cycling_activities']} journeys were not cycling, "
             f"{counters['n_journeys_outside_London']} journeys started outside London"
         )
