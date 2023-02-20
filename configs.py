@@ -37,7 +37,7 @@ making_videos = True
 
 # Set area of interest - currently set to London
 x_lims = (-25400, 3400)
-y_lims = (6668683, 6688404)
+y_lims = (6667992, 6689192)
 
 x_lims_broader = tuple(np.mean(x_lims) + ((x_lims - np.mean(x_lims)) * 2))
 y_lims_broader = tuple(np.mean(y_lims) + ((y_lims - np.mean(y_lims)) * 2))

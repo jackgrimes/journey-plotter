@@ -1217,7 +1217,7 @@ def make_all_other_frames(
     }
     plotter_inputs.update(journey_plots)
 
-    for journey in journey_files:
+    for journey in journey_files[3657:]:
 
         print_update(attempting_all, counters, no_journeys, start_time)
 
@@ -1236,6 +1236,11 @@ def make_all_other_frames(
             plotter_inputs,
             speeds,
         ) = initial_checks_on_activity_type_and_location(plotter_inputs, track)
+
+        if len(plotter_inputs["set_of_points"]) < 5:
+            counters["n_files_too_few_points"] += 1
+            counters["files_too_few_points"].append(journey)
+            continue
 
         counters = increment_counters_for_unplotted_journeys(
             activity_in_area_of_interest, cycling_activity, counters
@@ -1635,6 +1640,19 @@ def overall_run_notes(
             + "\n".join(counters["unparsable_files"])
             + "\n\n"
         )
+
+
+    outputs_str += (
+        "\n" + str(counters["n_files_too_few_points"]) + " journeys with too few points\n\n"
+    )
+
+    if counters["n_files_unparsable"] > 0:
+        outputs_str += (
+            "Journeys with too few points:\n"
+            + "\n".join(counters["files_too_few_points"])
+            + "\n\n"
+        )
+
     outputs_str += (
         "Summary of time taken:\n"
         + time_diff(overall_start_time, overall_finish_time)
@@ -1667,6 +1685,8 @@ def set_up_plot_lists_and_counters(journeys):
         "n_journeys_outside_London": 0,
         "n_non_cycling_activities": 0,
         "n_files_unparsable": 0,
+        "n_files_too_few_points": 0,
+        "files_too_few_points": [],
         "unparsable_files": [],
         "first_year": journeys[0].split("-")[0],
     }
