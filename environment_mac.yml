@@ -1,0 +1,10 @@
+name: journey_plotter
+dependencies:
+    - python==3.11
+    - geopandas==0.12.2
+    - gpxpy==1.5.0
+    - shapely==2.0.1
+    - pip==23.0.1
+    - pip:
+        - opencv-python==4.7.0.68
+        - matplotlib==3.1.0

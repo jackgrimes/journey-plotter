@@ -5,7 +5,7 @@ import numpy as np
 import time
 
 from utils import get_speeds
-from configs import data_path
+from configs.configs_maps import data_path
 
 all_speeds = []
 journeys = [

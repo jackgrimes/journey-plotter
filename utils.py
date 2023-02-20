@@ -14,22 +14,24 @@ import numpy as np
 import pandas as pd
 import shapely
 
-from configs import (
+from configs.configs_deployment import data_path
+from configs.configs_run import (
+    colored_black_end_points,
+    colored_not_black_end_points,
+    red,
+    making_videos,
+    image_interval,
+    n_concurrent,
+    n_concurrent_bubbling,
+    n_concurrent_bubbling_end_points,
+)
+from configs.configs_maps import (
     x_lims,
     y_lims,
-    data_path,
     x_lims_broader,
     y_lims_broader,
     scalarMap_time,
     base_layers_configs,
-    image_interval,
-    n_concurrent,
-    making_videos,
-    colored_black_end_points,
-    colored_not_black_end_points,
-    red,
-    n_concurrent_bubbling,
-    n_concurrent_bubbling_end_points,
     scalarMap,
 )
 
@@ -84,14 +86,7 @@ def time_diff(time1, time2):
     hours = days * 24 + seconds // 3600
     minutes = (seconds % 3600) // 60
     seconds = seconds % 60
-    return (
-        str(hours)
-        + " hours, "
-        + str(minutes)
-        + " minutes, "
-        + str(seconds)
-        + " seconds taken"
-    )
+    return str(hours) + " hours, " + str(minutes) + " minutes, " + str(seconds) + " seconds taken"
 
 
 def make_video(which_set_of_images, runstr, n_journeys_plotted):
@@ -101,17 +96,10 @@ def make_video(which_set_of_images, runstr, n_journeys_plotted):
 
     ext = "png"
 
-    dir_path = os.path.join(
-        os.path.join(data_path, "images_for_video"), which_set_of_images
-    )
+    dir_path = os.path.join(os.path.join(data_path, "images_for_video"), which_set_of_images)
     output = os.path.join(
         os.path.join(data_path, "results"),
-        runstr
-        + "_"
-        + which_set_of_images
-        + "__first_"
-        + str(n_journeys_plotted)
-        + "_journeys.mp4",
+        runstr + "_" + which_set_of_images + "__first_" + str(n_journeys_plotted) + "_journeys.mp4",
     )
 
     images = []
@@ -150,9 +138,7 @@ def make_video(which_set_of_images, runstr, n_journeys_plotted):
     print("The output video is {}".format(output))
 
     # Clear images folder
-    folder = os.path.join(
-        os.path.join(data_path, "images_for_video"), which_set_of_images
-    )
+    folder = os.path.join(os.path.join(data_path, "images_for_video"), which_set_of_images)
 
     for the_file in os.listdir(folder):
         file_path = os.path.join(folder, the_file)
@@ -195,9 +181,7 @@ def plotter_total(inputs):
     end_points_bubbling = inputs["end_points_bubbling"]
     end_points_shrinking = inputs["end_points_shrinking"]
 
-    set_of_points.plot(
-        categorical=False, legend=False, ax=ax, color=colors, alpha=0.1, markersize=0.2
-    )
+    set_of_points.plot(categorical=False, legend=False, ax=ax, color=colors, alpha=0.1, markersize=0.2)
 
     # Pack up returns
 
@@ -235,9 +219,7 @@ def plotter_moving_recents(inputs):
         lngs.append(row.geometry.x)
         lats.append(row.geometry.y)
 
-    journey_plots_for_moving_recents.append(
-        ax.scatter(lngs, lats, color=colors, s=3, marker="s", alpha=0.05)
-    )
+    journey_plots_for_moving_recents.append(ax.scatter(lngs, lats, color=colors, s=3, marker="s", alpha=0.05))
 
     if len(journey_plots_for_moving_recents) > n_concurrent:
         n_to_remove = len(journey_plots_for_moving_recents) - n_concurrent
@@ -287,9 +269,7 @@ def plotter_by_year(inputs):
             journey_plots_for_by_year[i].remove()
         journey_plots_for_by_year = []
 
-    journey_plots_for_by_year.append(
-        ax.scatter(lngs, lats, color=colors, s=2, marker="s", alpha=1)
-    )
+    journey_plots_for_by_year.append(ax.scatter(lngs, lats, color=colors, s=2, marker="s", alpha=1))
 
     # Pack up returns
 
@@ -355,9 +335,7 @@ def plotter_no_roads(inputs):
     end_points_bubbling = inputs["end_points_bubbling"]
     end_points_shrinking = inputs["end_points_shrinking"]
 
-    set_of_points.plot(
-        categorical=False, legend=False, ax=ax, color="white", alpha=0.1, markersize=0.1
-    )
+    set_of_points.plot(categorical=False, legend=False, ax=ax, color="white", alpha=0.1, markersize=0.1)
     # Pack up returns
 
     returns = {
@@ -390,9 +368,7 @@ def plotter_dark_colours_by_time(inputs):
 
     colors = scalarMap_time.to_rgba(journey_colour_score * 0.85)
 
-    set_of_points.plot(
-        categorical=False, legend=False, ax=ax, color=colors, alpha=0.06, markersize=0.3
-    )
+    set_of_points.plot(categorical=False, legend=False, ax=ax, color=colors, alpha=0.06, markersize=0.3)
     # Pack up returns
 
     returns = pack_up_returns(
@@ -422,9 +398,7 @@ def plotter_alpha_one(inputs):
     end_points_bubbling = inputs["end_points_bubbling"]
     end_points_shrinking = inputs["end_points_shrinking"]
 
-    set_of_points.plot(
-        categorical=False, legend=False, ax=ax, color=colors, alpha=1, markersize=0.05
-    )
+    set_of_points.plot(categorical=False, legend=False, ax=ax, color=colors, alpha=1, markersize=0.05)
     # Pack up returns
 
     returns = pack_up_returns(
@@ -713,9 +687,8 @@ def plotter_end_points_shrinking(inputs):
 def which_layers_needed(map_configs):
     all_layers = []
     for key, value in map_configs.items():
-        if value["plotting_or_not"]:
-            for layer in value["layers"]:
-                all_layers.append(layer)
+        for layer in value["layers"]:
+            all_layers.append(layer)
     return list(set(all_layers))
 
 
@@ -723,26 +696,25 @@ def read_in_required_layers(layers_to_read):
     base_layers = {}
     for layer_to_read in layers_to_read:
         logger.info("Reading in " + layer_to_read + " map")
-        try:
-            base_layers[layer_to_read] = gpd.read_file(
-                os.path.join(
-                    data_path,
-                    os.path.join(
-                        r"OS_base_maps/OS OpenMap Local (ESRI Shape File) TQ/data/",
-                        base_layers_configs[layer_to_read][0],
-                    ),
-                )
+
+        if layer_to_read == "parks":
+            map_path = os.path.join(
+                data_path,
+                r"OS_base_maps",
+                "OS Open Greenspace (ESRI Shape File) TQ",
+                "data",
+                base_layers_configs[layer_to_read][0],
             )
-        except:
-            base_layers[layer_to_read] = gpd.read_file(
-                os.path.join(
-                    data_path,
-                    os.path.join(
-                        r"OS_base_maps/OS Open Greenspace (ESRI Shape File) TQ/data/",
-                        base_layers_configs[layer_to_read][0],
-                    ),
-                )
+
+        else:
+            map_path = os.path.join(
+                data_path,
+                "OS_base_maps",
+                "OS OpenMap Local (ESRI Shape File) TQ",
+                "data",
+                base_layers_configs[layer_to_read][0],
             )
+        base_layers[layer_to_read] = gpd.read_file(map_path)
     return base_layers
 
 
@@ -782,12 +754,11 @@ def convert_crop_base_map_layers(base_layers):
     for key, value in base_layers.items():
         logger.info("Cropping " + key + " layer to London area")
         base_layers[key] = base_layers[key].cx[
-            lims[0] : lims[2], lims[1] : lims[3],
+            lims[0] : lims[2],
+            lims[1] : lims[3],
         ]
         logger.info("Converting coordinates in " + key)
-        base_layers[key]["geometry"] = base_layers[key]["geometry"].to_crs(
-            "epsg:3395"
-        )  # Mercator
+        base_layers[key]["geometry"] = base_layers[key]["geometry"].to_crs("epsg:3395")  # Mercator
     return base_layers
 
 
@@ -815,11 +786,7 @@ def get_speeds(lats, lngs, times):
             * np.arcsin(
                 (
                     (np.sin((df["y2_rad"] - df["y1_rad"]) / 2) ** 2)
-                    + (
-                        np.cos(df["y1_rad"])
-                        * np.cos(df["y2_rad"])
-                        * ((np.sin((df["x2_rad"] - df["x1_rad"]) / 2)) ** 2)
-                    )
+                    + (np.cos(df["y1_rad"]) * np.cos(df["y2_rad"]) * ((np.sin((df["x2_rad"] - df["x1_rad"]) / 2)) ** 2))
                 )
                 ** 0.5
             )
@@ -862,14 +829,11 @@ def clear_out_old_folders_and_make_new(map_configs):
     # Remove old folders
     if len(os.listdir(os.path.join(data_path, "images_for_video"))) > 0:
         for folder in os.listdir(os.path.join(data_path, "images_for_video")):
-            shutil.rmtree(
-                os.path.join(os.path.join(data_path, "images_for_video"), folder)
-            )
+            shutil.rmtree(os.path.join(os.path.join(data_path, "images_for_video"), folder))
 
     # Generate new folders
     for key, item in map_configs.items():
-        if item["plotting_or_not"]:
-            os.mkdir(os.path.join(os.path.join(data_path, "images_for_video"), key))
+        os.mkdir(os.path.join(os.path.join(data_path, "images_for_video"), key))
 
 
 def plot_base_map_layers(base_layers, map_configs):
@@ -882,48 +846,42 @@ def plot_base_map_layers(base_layers, map_configs):
     maps_dict = {}
     # Plot the base layers for all maps being made
     for key, value in map_configs.items():
-        if value["plotting_or_not"]:
-            print("")
-            fig, ax = plt.subplots(figsize=(14 * 2, 6 * 2))
-            ax.set_xlim(x_lims[0], x_lims[1])
-            ax.set_ylim(y_lims[0], y_lims[1])
-            x_axis = ax.axes.get_xaxis()
-            x_axis.set_visible(False)
-            y_axis = ax.axes.get_yaxis()
-            y_axis.set_visible(False)
-            if key in ["dark", "dark_colours_by_time"] and (
-                "tidal_water" in value["layers"]
-            ):
-                logger.info(f"Plotting tidal_water for {key}")
-                ax.set_facecolor(tuple([x / 255 for x in [0, 0, 0]]))
+        fig, ax = plt.subplots(figsize=(14 * 2, 6 * 2))
+        ax.set_xlim(x_lims[0], x_lims[1])
+        ax.set_ylim(y_lims[0], y_lims[1])
+        x_axis = ax.axes.get_xaxis()
+        x_axis.set_visible(False)
+        y_axis = ax.axes.get_yaxis()
+        y_axis.set_visible(False)
+        if key in ["dark", "dark_colours_by_time"] and ("tidal_water" in value["layers"]):
+            logger.info(f"Plotting tidal_water for {key}")
+            ax.set_facecolor(tuple([x / 255 for x in [0, 0, 0]]))
+            maps_dict[key] = [fig, ax, x_axis, y_axis]
+            maps_dict[key][1] = base_layers["tidal_water"].plot(
+                categorical=False,
+                legend=False,
+                ax=maps_dict[key][1],
+                color=tuple([x / 255 for x in [0, 0, 60]]),
+                zorder=0,
+            )
+        else:
+            for layer in value["layers"]:
+                logger.info(f"Plotting {layer} for {key}")
+                ax.set_facecolor(tuple([x / 255 for x in [232, 237, 232]]))
                 maps_dict[key] = [fig, ax, x_axis, y_axis]
-                maps_dict[key][1] = base_layers["tidal_water"].plot(
+                maps_dict[key][1] = base_layers[layer].plot(
                     categorical=False,
                     legend=False,
                     ax=maps_dict[key][1],
-                    color=tuple([x / 255 for x in [0, 0, 60]]),
+                    color=base_layers_configs[layer][1],
                     zorder=0,
                 )
-            else:
-                for layer in value["layers"]:
-                    logger.info(f"Plotting {layer} for {key}")
-                    ax.set_facecolor(tuple([x / 255 for x in [232, 237, 232]]))
-                    maps_dict[key] = [fig, ax, x_axis, y_axis]
-                    maps_dict[key][1] = base_layers[layer].plot(
-                        categorical=False,
-                        legend=False,
-                        ax=maps_dict[key][1],
-                        color=base_layers_configs[layer][1],
-                        zorder=0,
-                    )
     return maps_dict
 
 
 def parse_the_args():
     parser = argparse.ArgumentParser(description="Process some integers.")
-    parser.add_argument(
-        "--no_journeys", type=str, default="", help="How many journeys to include?"
-    )
+    parser.add_argument("--no_journeys", type=str, default="", help="How many journeys to include?")
     parser.add_argument(
         "--is_debug",
         default=False,
@@ -943,9 +901,7 @@ def get_journey_files(no_journeys):
 
     logger.info("Getting the journey files")
 
-    journey_files = sorted(
-        [x for x in os.listdir(os.path.join(data_path, "cycling_data")) if ".gpx" in x]
-    )
+    journey_files = sorted([x for x in os.listdir(os.path.join(data_path, "cycling_data")) if ".gpx" in x])
 
     if no_journeys == "":
         no_journeys = len(journey_files)
@@ -959,42 +915,38 @@ def get_journey_files(no_journeys):
 
 def make_first_frames(counters, journeys, text_vars, maps_dict, map_configs):
     for map_scheme_name, map_scheme_configs in map_configs.items():
-        if map_scheme_configs["plotting_or_not"]:
-            filename = os.path.join(
-                os.path.join(
-                    os.path.join(data_path, "images_for_video"), map_scheme_name
-                ),
-                "first_"
-                + str(counters["n_journeys_plotted"]).zfill(4)
-                + "_journeys.png",
+        filename = os.path.join(
+            os.path.join(os.path.join(data_path, "images_for_video"), map_scheme_name),
+            "first_" + str(counters["n_journeys_plotted"]).zfill(4) + "_journeys.png",
+        )
+
+        timestr = counters["first_year"] + " - " + journeys[0].split("-")[0]
+        timestr_moving_recents = journeys[0].split("-")[0]
+        if map_scheme_name in ["running_recents", "by_year"]:
+            text_vars[map_scheme_name] = maps_dict[map_scheme_name][0].text(
+                0.9650,
+                0.985,
+                timestr_moving_recents,
+                horizontalalignment="left",
+                verticalalignment="top",
+                transform=maps_dict[map_scheme_name][1].transAxes,
+                color=map_configs[map_scheme_name]["year_text"],
+            )
+        else:
+            text_vars[map_scheme_name] = maps_dict[map_scheme_name][0].text(
+                0.9250,
+                0.985,
+                timestr,
+                horizontalalignment="left",
+                verticalalignment="top",
+                transform=maps_dict[map_scheme_name][1].transAxes,
+                color=map_configs[map_scheme_name]["year_text"],
             )
 
-            timestr = counters["first_year"] + " - " + journeys[0].split("-")[0]
-            timestr_moving_recents = journeys[0].split("-")[0]
-            if map_scheme_name in ["running_recents", "by_year"]:
-                text_vars[map_scheme_name] = maps_dict[map_scheme_name][0].text(
-                    0.9650,
-                    0.985,
-                    timestr_moving_recents,
-                    horizontalalignment="left",
-                    verticalalignment="top",
-                    transform=maps_dict[map_scheme_name][1].transAxes,
-                    color=map_configs[map_scheme_name]["year_text"],
-                )
-            else:
-                text_vars[map_scheme_name] = maps_dict[map_scheme_name][0].text(
-                    0.9250,
-                    0.985,
-                    timestr,
-                    horizontalalignment="left",
-                    verticalalignment="top",
-                    transform=maps_dict[map_scheme_name][1].transAxes,
-                    color=map_configs[map_scheme_name]["year_text"],
-                )
-
-            maps_dict[map_scheme_name][0].savefig(
-                filename, bbox_inches="tight",
-            )
+        maps_dict[map_scheme_name][0].savefig(
+            filename,
+            bbox_inches="tight",
+        )
 
     return timestr, timestr_moving_recents, text_vars
 
@@ -1010,9 +962,7 @@ def print_update(attempting_all, counters, no_journeys, start_time):
             f"journeys were unparsable, {counters['n_non_cycling_activities']} journeys were not cycling, "
             f"{counters['n_journeys_outside_London']} journeys started outside London"
         )
-        logger.info(
-            timesince(start_time, 100 * counters["n_journeys_attempted"] / no_journeys)
-        )
+        logger.info(timesince(start_time, 100 * counters["n_journeys_attempted"] / no_journeys))
     else:
         logger.info(
             f"Attempting to plot journey number {counters['n_journeys_plotted'] + 1} of {no_journeys} "
@@ -1024,15 +974,11 @@ def print_update(attempting_all, counters, no_journeys, start_time):
             f"{counters['n_non_cycling_activities']} journeys were not cycling, "
             f"{counters['n_journeys_outside_London']} journeys started outside London"
         )
-        logger.info(
-            timesince(start_time, 100 * counters["n_journeys_plotted"] / no_journeys)
-        )
+        logger.info(timesince(start_time, 100 * counters["n_journeys_plotted"] / no_journeys))
 
 
 def get_track(data_path, journey):
-    gpx = gpxpy.parse(
-        open(os.path.join(os.path.join(data_path, "cycling_data"), journey))
-    )
+    gpx = gpxpy.parse(open(os.path.join(os.path.join(data_path, "cycling_data"), journey)))
     track = gpx.tracks[0]
     return track
 
@@ -1071,19 +1017,19 @@ def starts_or_finishes_in_area_of_interest(new_point_gdf):
     )
 
 
-def save_by_year_plot_if_new_year(
-    new_journey_year, counters, maps_dict, map_configs, runstr
-):
+def save_by_year_plot_if_new_year(new_journey_year, counters, maps_dict, map_configs, runstr):
     journey_year_change = False
     if new_journey_year != counters["journey_year"]:
         journey_year_change = True
-        if map_configs["by_year"]["plotting_or_not"]:
+        if "by_year" in map_configs.keys():
             filename = os.path.join(
                 os.path.join(data_path, "results"),
                 runstr + "_cycling_in_year_" + counters["journey_year"] + ".png",
             )
             maps_dict["by_year"][0].savefig(
-                filename, bbox_inches="tight", ax=maps_dict["by_year"][1],
+                filename,
+                bbox_inches="tight",
+                ax=maps_dict["by_year"][1],
             )  # Output the by_year maps at the end of the year
     return journey_year_change
 
@@ -1141,14 +1087,14 @@ def save_frames_for_video(making_videos, counters, maps_dict, map_scheme_name):
         if (counters["n_journeys_plotted"] + 1) % image_interval == 0:
             filename = os.path.join(
                 os.path.join(
-                    os.path.join(data_path, "images_for_video"), map_scheme_name,
+                    os.path.join(data_path, "images_for_video"),
+                    map_scheme_name,
                 ),
-                "first_"
-                + str(counters["n_journeys_plotted"] + 1).zfill(4)
-                + "_journeys.png",
+                "first_" + str(counters["n_journeys_plotted"] + 1).zfill(4) + "_journeys.png",
             )
             maps_dict[map_scheme_name][0].savefig(
-                filename, bbox_inches="tight",
+                filename,
+                bbox_inches="tight",
             )
 
 
@@ -1165,15 +1111,11 @@ def increment_counters(counters, new_timestr, new_timestr_moving_recents):
 def initial_checks_on_activity_type_and_location(plotter_inputs, track):
     cycling_activity = "cycling" in track.name.lower()
     plotter_inputs["set_of_points"], speeds = convert_to_gdf(track)
-    activity_in_area_of_interest = starts_or_finishes_in_area_of_interest(
-        plotter_inputs["set_of_points"]
-    )
+    activity_in_area_of_interest = starts_or_finishes_in_area_of_interest(plotter_inputs["set_of_points"])
     return cycling_activity, activity_in_area_of_interest, plotter_inputs, speeds
 
 
-def increment_counters_for_unplotted_journeys(
-    activity_in_area_of_interest, cycling_activity, counters
-):
+def increment_counters_for_unplotted_journeys(activity_in_area_of_interest, cycling_activity, counters):
     if not activity_in_area_of_interest:
         print("Activity outside of London limits so not plotted")
         counters["n_journeys_outside_London"] += 1
@@ -1217,7 +1159,7 @@ def make_all_other_frames(
     }
     plotter_inputs.update(journey_plots)
 
-    for journey in journey_files[3657:]:
+    for journey in journey_files:
 
         print_update(attempting_all, counters, no_journeys, start_time)
 
@@ -1242,9 +1184,7 @@ def make_all_other_frames(
             counters["files_too_few_points"].append(journey)
             continue
 
-        counters = increment_counters_for_unplotted_journeys(
-            activity_in_area_of_interest, cycling_activity, counters
-        )
+        counters = increment_counters_for_unplotted_journeys(activity_in_area_of_interest, cycling_activity, counters)
 
         if cycling_activity and activity_in_area_of_interest:
 
@@ -1253,40 +1193,42 @@ def make_all_other_frames(
             counters["new_journey_year"] = journey.split("-")[0]
 
             plotter_inputs["journey_year_change"] = save_by_year_plot_if_new_year(
-                counters["new_journey_year"], counters, maps_dict, map_configs, runstr,
+                counters["new_journey_year"],
+                counters,
+                maps_dict,
+                map_configs,
+                runstr,
             )
 
             plotter_inputs["colors"] = set_colors(
-                colored_black_end_points, colored_not_black_end_points, red, speeds,
+                colored_black_end_points,
+                colored_not_black_end_points,
+                red,
+                speeds,
             )
 
             for map_scheme_name, map_scheme_configs in map_configs.items():
-                if map_scheme_configs["plotting_or_not"]:
 
-                    plotter_inputs.update(
-                        {
-                            "journey_year": counters["journey_year"],
-                            "ax": maps_dict[map_scheme_name][1],
-                            "journey_colour_score": journey_colour_score,
-                        }
-                    )
-                    plotter_inputs.update(
-                        plotter_functions_dict[map_scheme_name](plotter_inputs)
-                    )
+                plotter_inputs.update(
+                    {
+                        "journey_year": counters["journey_year"],
+                        "ax": maps_dict[map_scheme_name][1],
+                        "journey_colour_score": journey_colour_score,
+                    }
+                )
+                plotter_inputs.update(plotter_functions_dict[map_scheme_name](plotter_inputs))
 
-                    text_vars = update_timestr_if_necessary(
-                        timestr,
-                        new_timestr,
-                        text_vars,
-                        map_scheme_name,
-                        maps_dict,
-                        new_timestr_moving_recents,
-                        map_configs,
-                    )
+                text_vars = update_timestr_if_necessary(
+                    timestr,
+                    new_timestr,
+                    text_vars,
+                    map_scheme_name,
+                    maps_dict,
+                    new_timestr_moving_recents,
+                    map_configs,
+                )
 
-                    save_frames_for_video(
-                        making_videos, counters, maps_dict, map_scheme_name
-                    )
+                save_frames_for_video(making_videos, counters, maps_dict, map_scheme_name)
 
             counters, timestr, timestr_moving_recents = increment_counters(
                 counters, new_timestr, new_timestr_moving_recents
@@ -1314,27 +1256,18 @@ def make_final_by_year_image(runstr, counters, maps_dict, map_configs):
     # Save the final images
     logger.info("Saving the final images...")
     for map_scheme_name, map_scheme_configs in map_configs.items():
-        if (
-            map_scheme_configs["final_figure_output"]
-            and map_scheme_configs["plotting_or_not"]
-        ):
+        if map_scheme_configs["final_figure_output"] and map_scheme_configs["plotting_or_not"]:
             filename = os.path.join(
                 os.path.join(data_path, "results"),
-                runstr
-                + "_"
-                + map_scheme_name
-                + "__first_"
-                + str(counters["n_journeys_plotted"])
-                + "_journeys.png",
+                runstr + "_" + map_scheme_name + "__first_" + str(counters["n_journeys_plotted"]) + "_journeys.png",
             )
             maps_dict[map_scheme_name][0].savefig(
-                filename, bbox_inches="tight",
+                filename,
+                bbox_inches="tight",
             )
 
 
-def additional_frames_journeys_fading_out(
-    journey_files, maps_dict, journey_plots, counters, map_configs
-):
+def additional_frames_journeys_fading_out(journey_files, maps_dict, journey_plots, counters, map_configs):
     # Add on some more frames to running_recents, where older journey_files disappear one by one
     # todo: refactor function
     if making_videos:
@@ -1362,9 +1295,7 @@ def additional_frames_journeys_fading_out(
                             os.path.join(data_path, "images_for_video"),
                             "running_recents",
                         ),
-                        "first_"
-                        + str(counters["n_journeys_plotted"] + index + 1).zfill(4)
-                        + "_journeys.png",
+                        "first_" + str(counters["n_journeys_plotted"] + index + 1).zfill(4) + "_journeys.png",
                     )
                     maps_dict["running_recents"][0].savefig(
                         filename,
@@ -1408,9 +1339,7 @@ def additional_frames_journeys_fading_out(
                             os.path.join(data_path, "images_for_video"),
                             "overall_bubbling_off",
                         ),
-                        "first_"
-                        + str(counters["n_journeys_plotted"] + index + 1).zfill(4)
-                        + "_journeys.png",
+                        "first_" + str(counters["n_journeys_plotted"] + index + 1).zfill(4) + "_journeys.png",
                     )
                     maps_dict["overall_bubbling_off"][0].savefig(
                         filename,
@@ -1454,9 +1383,7 @@ def additional_frames_journeys_fading_out(
                             os.path.join(data_path, "images_for_video"),
                             "end_points_bubbling",
                         ),
-                        "first_"
-                        + str(counters["n_journeys_plotted"] + index + 1).zfill(4)
-                        + "_journeys.png",
+                        "first_" + str(counters["n_journeys_plotted"] + index + 1).zfill(4) + "_journeys.png",
                     )
                     maps_dict["end_points_bubbling"][0].savefig(
                         filename,
@@ -1473,18 +1400,14 @@ def additional_frames_journeys_fading_out(
             timestr = counters["first_year"] + " - " + journey_files[-1].split("-")[0]
             # journey_plots_for_moving_recents defined above, and written to in the plotter_moving_recents function
             print("")
-            sizes = [
-                points._sizes for points in journey_plots["journey_plots_shrinking"]
-            ]
+            sizes = [points._sizes for points in journey_plots["journey_plots_shrinking"]]
             sizes = [size[0] for size in sizes]
             max_sizes = max(sizes)
 
             rat = 0.95
             min_size = 1
 
-            number_plots_to_do = math.ceil(
-                (np.log(min_size) - np.log(max_sizes)) / np.log(rat)
-            )
+            number_plots_to_do = math.ceil((np.log(min_size) - np.log(max_sizes)) / np.log(rat))
 
             for i in range(number_plots_to_do):
                 print(
@@ -1507,9 +1430,7 @@ def additional_frames_journeys_fading_out(
                             os.path.join(data_path, "images_for_video"),
                             "overall_shrinking",
                         ),
-                        "first_"
-                        + str(counters["n_journeys_plotted"] + index + 1).zfill(4)
-                        + "_journeys.png",
+                        "first_" + str(counters["n_journeys_plotted"] + index + 1).zfill(4) + "_journeys.png",
                     )
                     maps_dict["overall_shrinking"][0].savefig(
                         filename,
@@ -1533,9 +1454,7 @@ def additional_frames_journeys_fading_out(
             rat = 0.9
             min_size = 10
 
-            number_plots_to_do = math.ceil(
-                (np.log(min_size) - np.log(max_sizes)) / np.log(rat)
-            )
+            number_plots_to_do = math.ceil((np.log(min_size) - np.log(max_sizes)) / np.log(rat))
 
             for i in range(number_plots_to_do):
                 print(
@@ -1558,9 +1477,7 @@ def additional_frames_journeys_fading_out(
                             os.path.join(data_path, "images_for_video"),
                             "end_points_shrinking",
                         ),
-                        "first_"
-                        + str(counters["n_journeys_plotted"] + index + 1).zfill(4)
-                        + "_journeys.png",
+                        "first_" + str(counters["n_journeys_plotted"] + index + 1).zfill(4) + "_journeys.png",
                     )
                     maps_dict["end_points_shrinking"][0].savefig(
                         filename,
@@ -1584,9 +1501,7 @@ def clear_out_images_for_video_folder(making_videos):
     if making_videos:
         if len(os.listdir(os.path.join(data_path, "images_for_video"))) > 0:
             for folder in os.listdir(os.path.join(data_path, "images_for_video")):
-                shutil.rmtree(
-                    os.path.join(os.path.join(data_path, "images_for_video"), folder)
-                )
+                shutil.rmtree(os.path.join(os.path.join(data_path, "images_for_video"), folder))
 
 
 def overall_run_notes(
@@ -1605,9 +1520,7 @@ def overall_run_notes(
     if attempting_all:
         outputs_str += "Attempted all the images\n\n"
     else:
-        outputs_str += (
-            "Attempted a subset of " + str(no_journeys) + " of the journeys\n\n"
-        )
+        outputs_str += "Attempted a subset of " + str(no_journeys) + " of the journeys\n\n"
 
     outputs_str += "Plots made:\n"
 
@@ -1616,48 +1529,21 @@ def overall_run_notes(
             outputs_str += map_scheme_name
             outputs_str += "\n"
 
-    outputs_str += (
-        "\n" + str(counters["n_journeys_attempted"]) + " journey plots attempted"
-    )
-    outputs_str += (
-        "\n" + str(counters["n_journeys_plotted"]) + " journeys successfully plotted"
-    )
-    outputs_str += (
-        "\n" + str(counters["n_non_cycling_activities"]) + " journeys were not cycling"
-    )
-    outputs_str += (
-        "\n"
-        + str(counters["n_journeys_outside_London"])
-        + " journeys were outside of London"
-    )
-    outputs_str += (
-        "\n" + str(counters["n_files_unparsable"]) + " journeys would not parse\n\n"
-    )
+    outputs_str += "\n" + str(counters["n_journeys_attempted"]) + " journey plots attempted"
+    outputs_str += "\n" + str(counters["n_journeys_plotted"]) + " journeys successfully plotted"
+    outputs_str += "\n" + str(counters["n_non_cycling_activities"]) + " journeys were not cycling"
+    outputs_str += "\n" + str(counters["n_journeys_outside_London"]) + " journeys were outside of London"
+    outputs_str += "\n" + str(counters["n_files_unparsable"]) + " journeys would not parse\n\n"
 
     if counters["n_files_unparsable"] > 0:
-        outputs_str += (
-            "Journeys that would not parse:\n"
-            + "\n".join(counters["unparsable_files"])
-            + "\n\n"
-        )
+        outputs_str += "Journeys that would not parse:\n" + "\n".join(counters["unparsable_files"]) + "\n\n"
 
-
-    outputs_str += (
-        "\n" + str(counters["n_files_too_few_points"]) + " journeys with too few points\n\n"
-    )
+    outputs_str += "\n" + str(counters["n_files_too_few_points"]) + " journeys with too few points\n\n"
 
     if counters["n_files_unparsable"] > 0:
-        outputs_str += (
-            "Journeys with too few points:\n"
-            + "\n".join(counters["files_too_few_points"])
-            + "\n\n"
-        )
+        outputs_str += "Journeys with too few points:\n" + "\n".join(counters["files_too_few_points"]) + "\n\n"
 
-    outputs_str += (
-        "Summary of time taken:\n"
-        + time_diff(overall_start_time, overall_finish_time)
-        + " on everything\n"
-    )
+    outputs_str += "Summary of time taken:\n" + time_diff(overall_start_time, overall_finish_time) + " on everything\n"
 
     print("Info about the run\n")
     print(outputs_str)
@@ -1701,24 +1587,10 @@ def set_up_plot_lists_and_counters(journeys):
     )
 
 
-def configure_logger(runstr):
-    """
-    Sets up a logger that prints to the console and to a file
-    Returns:
-        logger object
-    """
-    logging.basicConfig(
-        format="%(asctime)s %(message)s",
-        level=logging.INFO,
-        datefmt="%m/%d/%Y %I:%M:%S %p",
-    )
-    logFormatter = logging.Formatter(
-        "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s"
-    )
-    logger = logging.getLogger()
-    fileHandler = logging.FileHandler(
-        os.path.join(os.path.join(data_path, "results"), "{}run.log".format(runstr))
-    )
-    fileHandler.setFormatter(logFormatter)
-    logger.addHandler(fileHandler)
-    return logger
+def reduce_map_configs_to_maps_being_made(map_configs, which_maps_to_make):
+
+    maps_to_make = [k for k, v in which_maps_to_make.items() if v]
+
+    map_configs = {k: v for k, v in map_configs.items() if k in maps_to_make}
+
+    return map_configs

@@ -18,7 +18,7 @@ from utils import (
     get_speeds,
     scalarMap,
 )
-from configs import (
+from configs.configs_maps import (
     base_layers_configs,
     map_configs,
     colored_black_end_points,

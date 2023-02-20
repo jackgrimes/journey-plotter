@@ -1,4 +1,4 @@
-name: journey_plotter2
+name: journey_plotter
 dependencies:
     - python==3.11
     - geopandas==0.8.2

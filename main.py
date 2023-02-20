@@ -8,8 +8,8 @@
 # todo: replace all prints with logger
 
 import datetime
-
-from configs import MAP_CONFIGS
+from configs.configs_run import which_maps_to_make
+from configs.configs_maps import MAP_CONFIGS
 from utils import (
     read_in_convert_base_maps,
     clear_out_old_folders_and_make_new,
@@ -24,12 +24,17 @@ from utils import (
     make_all_videos,
     clear_out_images_for_video_folder,
     overall_run_notes,
-    set_up_plot_lists_and_counters,
+    set_up_plot_lists_and_counters, reduce_map_configs_to_maps_being_made
 )
+import os
+import sys
 
 
 # todo: add to requirements
 # import tqdm
+
+
+os.environ["PROJ_LIB"] = os.path.join( os.path.dirname(os.path.dirname(sys.executable)), "share", "proj")
 
 
 def run(no_journeys, map_configs):
@@ -37,6 +42,8 @@ def run(no_journeys, map_configs):
     overall_start_time, runstr = get_start_time()
 
     journey_files, no_journeys, attempting_all = get_journey_files(no_journeys)
+
+    map_configs = reduce_map_configs_to_maps_being_made(map_configs, which_maps_to_make)
 
     base_layers = read_in_convert_base_maps(map_configs)
 
@@ -93,6 +100,8 @@ if __name__ == "__main__":
     # tqdm.pandas()
 
     args = parse_the_args()
+
+
 
     map_configs = MAP_CONFIGS
 
