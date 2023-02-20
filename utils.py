@@ -19,8 +19,6 @@ from configs.configs_deployment import data_path
 from configs.configs_maps import (
     x_lims,
     y_lims,
-    x_lims_broader,
-    y_lims_broader,
     scalarMap_time,
     base_layers_configs,
     scalarMap,
@@ -36,58 +34,18 @@ from configs.configs_run import (
     n_concurrent_bubbling_end_points,
 )
 
+runstr = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_")
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s",
     datefmt="%Y-%d %H:%M:%S",
+    handlers=[
+        logging.FileHandler(os.path.join(data_path, "results", f"{runstr}run.log")),
+        logging.StreamHandler(),
+    ],
 )
 logger = logging.getLogger(__name__)
 
-
-def timesince(time, percent_done):
-    """Time since is used for measuring time since this same function was called, and for estimating time remaining"""
-    diff = datetime.datetime.now() - time
-    days, seconds = diff.days, diff.seconds
-    hours = days * 24 + seconds // 3600
-    minutes = (seconds % 3600) // 60
-    seconds = seconds % 60
-    try:
-        remaining_diff = (diff / percent_done) * 100 - diff
-        remaining_days, remaining_seconds = remaining_diff.days, remaining_diff.seconds
-        remaining_hours = remaining_days * 24 + remaining_seconds // 3600
-        remaining_minutes = (remaining_seconds % 3600) // 60
-        remaining_seconds = remaining_seconds % 60
-        return (
-            str(hours)
-            + " hours, "
-            + str(minutes)
-            + " minutes, "
-            + str(seconds)
-            + " seconds taken so far"
-            + "\n"
-            + "Estimated "
-            + str(remaining_hours)
-            + " hours, "
-            + str(remaining_minutes)
-            + " minutes, "
-            + str(remaining_seconds)
-            + " seconds to completion"
-            + "\n"
-            + "Estimated completion time: "
-            + (datetime.datetime.now() + remaining_diff).strftime("%H:%M:%S")
-        )
-    except:
-        return "Cannot calculate times elapsed and remaining at this time"
-
-
-def time_diff(time1, time2):
-    """Returns a sting of duration between two times"""
-    diff = time2 - time1
-    days, seconds = diff.days, diff.seconds
-    hours = days * 24 + seconds // 3600
-    minutes = (seconds % 3600) // 60
-    seconds = seconds % 60
-    return str(hours) + " hours, " + str(minutes) + " minutes, " + str(seconds) + " seconds taken"
 
 def crop(layer, x_lims, y_lims):
     lims_gs = gpd.GeoSeries(
@@ -105,15 +63,16 @@ def crop(layer, x_lims, y_lims):
     lims = list(lims_gs.total_bounds)
 
     layer = layer.cx[
-            lims[0]: lims[2],
-            lims[1]: lims[3],
-            ]
+        lims[0] : lims[2],
+        lims[1] : lims[3],
+    ]
     return layer
+
 
 def make_video(which_set_of_images, runstr, n_journeys_plotted):
     """Code adapted from http://tsaith.github.io/combine-images-into-a-video-with-python-3-and-opencv-3.html
     Turns a set of images into an .mp4 video"""
-    print("\nMaking video of " + which_set_of_images + " images...")
+    logger.info("Making video of " + which_set_of_images + " images...")
 
     ext = "png"
 
@@ -156,7 +115,7 @@ def make_video(which_set_of_images, runstr, n_journeys_plotted):
     out.release()
     cv2.destroyAllWindows()
 
-    print("The output video is {}".format(output))
+    logger.info("The output video is {}".format(output))
 
     # Clear images folder
     folder = os.path.join(os.path.join(data_path, "images_for_video"), which_set_of_images)
@@ -758,7 +717,7 @@ def convert_crop_base_map_layers(layer):
     """Crop the base_map_layers to the London area"""
 
     layer = crop(layer, x_lims, y_lims)
-    layer["geometry"] = layer["geometry"].to_crs("epsg:4326")  # Mercator
+    layer.loc[:, "geometry"] = layer["geometry"].to_crs("epsg:4326")  # Mercator
     # After cropping, convert to Mercator
 
     return layer
@@ -904,12 +863,6 @@ def parse_the_args():
         help="Running a faster version of code for debugging?",
     )
     return parser.parse_args()
-
-
-def get_start_time():
-    overall_start_time = datetime.datetime.now()
-    runstr = overall_start_time.strftime("%Y_%m_%d__%H_%M_")
-    return overall_start_time, runstr
 
 
 def get_journey_files(no_journeys):
@@ -1130,7 +1083,6 @@ def make_all_other_frames(
     no_journeys,
     start_time,
     maps_dict,
-    runstr,
     text_vars,
     timestr,
     journey_plots,
@@ -1224,7 +1176,7 @@ def make_all_other_frames(
     return counters
 
 
-def make_final_by_year_image(runstr, counters, maps_dict, map_configs):
+def make_final_by_year_image(counters, maps_dict, map_configs):
 
     # Save the final by_year image - done separately to the other image formats below,
     # due to the difference in filename
@@ -1471,7 +1423,7 @@ def additional_frames_journeys_fading_out(journey_files, maps_dict, journey_plot
                 index += 1
 
 
-def make_all_videos(runstr, counters, map_configs):
+def make_all_videos(counters, map_configs):
     # Make the videos
     if making_videos:
         for map_scheme_name, map_scheme_configs in map_configs.items():
@@ -1484,53 +1436,6 @@ def clear_out_images_for_video_folder(making_videos):
         if len(os.listdir(os.path.join(data_path, "images_for_video"))) > 0:
             for folder in os.listdir(os.path.join(data_path, "images_for_video")):
                 shutil.rmtree(os.path.join(os.path.join(data_path, "images_for_video"), folder))
-
-
-def overall_run_notes(
-    runstr,
-    attempting_all,
-    no_journeys,
-    overall_start_time,
-    overall_finish_time,
-    counters,
-    map_configs,
-):
-
-    outputs_str = ""
-    outputs_str += "Journeys plotted at " + runstr[0:-1] + "\n\n"
-    outputs_str += "Making videos was " + str(making_videos) + "\n\n"
-    if attempting_all:
-        outputs_str += "Attempted all the images\n\n"
-    else:
-        outputs_str += "Attempted a subset of " + str(no_journeys) + " of the journeys\n\n"
-
-    outputs_str += "Plots made:\n"
-
-    for map_scheme_name, map_scheme_configs in map_configs.items():
-        outputs_str += map_scheme_name
-        outputs_str += "\n"
-
-    outputs_str += "\n" + str(counters["n_journeys_attempted"]) + " journey plots attempted"
-    outputs_str += "\n" + str(counters["n_journeys_plotted"]) + " journeys successfully plotted"
-    outputs_str += "\n" + str(counters["n_non_cycling_activities"]) + " journeys were not cycling"
-    outputs_str += "\n" + str(counters["n_journeys_outside_London"]) + " journeys were outside of London"
-    outputs_str += "\n" + str(counters["n_files_unparsable"]) + " journeys would not parse\n\n"
-
-    if counters["n_files_unparsable"] > 0:
-        outputs_str += "Journeys that would not parse:\n" + "\n".join(counters["unparsable_files"]) + "\n\n"
-
-    outputs_str += "\n" + str(counters["n_files_too_few_points"]) + " journeys with too few points\n\n"
-
-    if counters["n_files_unparsable"] > 0:
-        outputs_str += "Journeys with too few points:\n" + "\n".join(counters["files_too_few_points"]) + "\n\n"
-
-    outputs_str += "Summary of time taken:\n" + time_diff(overall_start_time, overall_finish_time) + " on everything\n"
-
-    print("Info about the run\n")
-    print(outputs_str)
-
-    logger.info(outputs_str)
-    print("All done!")
 
 
 def set_up_plot_lists_and_counters(journeys):
