@@ -697,8 +697,6 @@ def which_layers_needed(map_configs):
 
 
 def read_in_original_file(layer_name):
-    logger.info(f"Reading in original file for {layer_name} map")
-
     if layer_name == "parks":
         map_path = os.path.join(
             data_path,
