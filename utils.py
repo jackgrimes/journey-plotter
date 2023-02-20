@@ -13,8 +13,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import shapely
+from tqdm import tqdm
 
 from configs.configs_deployment import data_path
+from configs.configs_maps import (
+    x_lims,
+    y_lims,
+    x_lims_broader,
+    y_lims_broader,
+    scalarMap_time,
+    base_layers_configs,
+    scalarMap,
+)
 from configs.configs_run import (
     colored_black_end_points,
     colored_not_black_end_points,
@@ -24,15 +34,6 @@ from configs.configs_run import (
     n_concurrent,
     n_concurrent_bubbling,
     n_concurrent_bubbling_end_points,
-)
-from configs.configs_maps import (
-    x_lims,
-    y_lims,
-    x_lims_broader,
-    y_lims_broader,
-    scalarMap_time,
-    base_layers_configs,
-    scalarMap,
 )
 
 logging.basicConfig(
@@ -951,32 +952,6 @@ def make_first_frames(counters, journeys, text_vars, maps_dict, map_configs):
     return timestr, timestr_moving_recents, text_vars
 
 
-def print_update(attempting_all, counters, no_journeys, start_time):
-    if attempting_all:
-        logger.info(
-            f"Attempting to plot journey number {counters['n_journeys_attempted'] + 1} of {no_journeys} "
-            f"({round(100 * counters['n_journeys_attempted'] / no_journeys, 2)}% done)"
-        )
-        logger.info(
-            f"{counters['n_journeys_plotted']} journeys were plotted successfully, {counters['n_files_unparsable']} "
-            f"journeys were unparsable, {counters['n_non_cycling_activities']} journeys were not cycling, "
-            f"{counters['n_journeys_outside_London']} journeys started outside London"
-        )
-        logger.info(timesince(start_time, 100 * counters["n_journeys_attempted"] / no_journeys))
-    else:
-        logger.info(
-            f"Attempting to plot journey number {counters['n_journeys_plotted'] + 1} of {no_journeys} "
-            f"({round(100 * counters['n_journeys_plotted'] / no_journeys, 2)}% done)"
-        )
-        logger.info(
-            f"{counters['n_journeys_plotted']} journeys were plotted successfully, "
-            f"{counters['n_files_unparsable']} journeys were unparsable, "
-            f"{counters['n_non_cycling_activities']} journeys were not cycling, "
-            f"{counters['n_journeys_outside_London']} journeys started outside London"
-        )
-        logger.info(timesince(start_time, 100 * counters["n_journeys_plotted"] / no_journeys))
-
-
 def get_track(data_path, journey):
     gpx = gpxpy.parse(open(os.path.join(os.path.join(data_path, "cycling_data"), journey)))
     track = gpx.tracks[0]
@@ -1159,10 +1134,7 @@ def make_all_other_frames(
     }
     plotter_inputs.update(journey_plots)
 
-    for journey in journey_files:
-
-        print_update(attempting_all, counters, no_journeys, start_time)
-
+    for journey in tqdm(journey_files):
         # for the dark_colours_by_time plot
         journey_colour_score = counters["n_journeys_plotted"] / no_journeys
 

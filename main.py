@@ -4,8 +4,6 @@
 # example debug usage python main.py --debug=True --no_journeys=20
 # example normal usage python main.py
 
-# todo: reduce arguments being passed around
-# todo: replace all prints with logger
 
 import datetime
 from configs.configs_run import which_maps_to_make
@@ -28,10 +26,6 @@ from utils import (
 )
 import os
 import sys
-
-
-# todo: add to requirements
-# import tqdm
 
 
 os.environ["PROJ_LIB"] = os.path.join( os.path.dirname(os.path.dirname(sys.executable)), "share", "proj")

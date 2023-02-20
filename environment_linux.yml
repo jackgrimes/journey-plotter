@@ -8,3 +8,4 @@ dependencies:
     - pip:
         - opencv-python==3.4.4.19
         - matplotlib==3.0.2
+        - tqdm==4.64.1
