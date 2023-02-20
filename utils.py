@@ -717,8 +717,8 @@ def convert_crop_base_map_layers(layer):
     """Crop the base_map_layers to the London area"""
 
     layer = crop(layer, x_lims, y_lims)
-    layer.loc[:, "geometry"] = layer["geometry"].to_crs("epsg:4326")  # Mercator
-    # After cropping, convert to Mercator
+
+    layer = layer.to_crs("epsg:4326") # Mercator
 
     return layer
 
