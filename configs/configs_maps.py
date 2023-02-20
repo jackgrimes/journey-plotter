@@ -3,9 +3,9 @@ import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import numpy as np
 
-# Set area of interest - currently set to London
-x_lims = (-25400, 3400)
-y_lims = (6667992, 6689192)
+# Set area of interest - currently set to London - is WGS 84/epsg:4326 format
+x_lims = (-0.23161763999482177, 0.023482985785112587)
+y_lims = (51.449560897899204, 51.56473914925004)
 
 x_lims_broader = tuple(np.mean(x_lims) + ((x_lims - np.mean(x_lims)) * 2))
 y_lims_broader = tuple(np.mean(y_lims) + ((y_lims - np.mean(y_lims)) * 2))

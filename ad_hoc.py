@@ -12,7 +12,7 @@ import datetime
 
 from utils import (
     which_layers_needed,
-    read_in_required_layers,
+    read_in_original_file,
     plotter_functions_dict,
     convert_crop_base_map_layers,
     get_speeds,
@@ -45,7 +45,7 @@ map_configs["overall_alpha_1"]["plotting_or_not"] = True
 
 # Find exactly which layers are needed, read them in, crop them down
 layers_to_read = which_layers_needed()
-base_layers = read_in_required_layers(layers_to_read)
+base_layers = read_in_original_file(layers_to_read)
 base_layers = convert_crop_base_map_layers(base_layers)
 
 plotting_all = False

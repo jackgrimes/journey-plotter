@@ -89,6 +89,26 @@ def time_diff(time1, time2):
     seconds = seconds % 60
     return str(hours) + " hours, " + str(minutes) + " minutes, " + str(seconds) + " seconds taken"
 
+def crop(layer, x_lims, y_lims):
+    lims_gs = gpd.GeoSeries(
+        [
+            shapely.geometry.Point(x_lims[0], y_lims[0]),
+            shapely.geometry.Point(x_lims[0], y_lims[1]),
+            shapely.geometry.Point(x_lims[1], y_lims[0]),
+            shapely.geometry.Point(x_lims[1], y_lims[1]),
+        ]
+    )
+    lims_gs = lims_gs.set_crs("epsg:4326")
+    lims_gs = lims_gs.to_crs("epsg:27700")
+    # Convert to maps' CRS to save time (takes more time to convert full maps)
+
+    lims = list(lims_gs.total_bounds)
+
+    layer = layer.cx[
+            lims[0]: lims[2],
+            lims[1]: lims[3],
+            ]
+    return layer
 
 def make_video(which_set_of_images, runstr, n_journeys_plotted):
     """Code adapted from http://tsaith.github.io/combine-images-into-a-video-with-python-3-and-opencv-3.html
@@ -693,30 +713,28 @@ def which_layers_needed(map_configs):
     return list(set(all_layers))
 
 
-def read_in_required_layers(layers_to_read):
-    base_layers = {}
-    for layer_to_read in layers_to_read:
-        logger.info("Reading in " + layer_to_read + " map")
+def read_in_original_file(layer_name):
+    logger.info(f"Reading in original file for {layer_name} map")
 
-        if layer_to_read == "parks":
-            map_path = os.path.join(
-                data_path,
-                r"OS_base_maps",
-                "OS Open Greenspace (ESRI Shape File) TQ",
-                "data",
-                base_layers_configs[layer_to_read][0],
-            )
+    if layer_name == "parks":
+        map_path = os.path.join(
+            data_path,
+            r"OS_base_maps",
+            "OS Open Greenspace (ESRI Shape File) TQ",
+            "data",
+            base_layers_configs[layer_name][0],
+        )
 
-        else:
-            map_path = os.path.join(
-                data_path,
-                "OS_base_maps",
-                "OS OpenMap Local (ESRI Shape File) TQ",
-                "data",
-                base_layers_configs[layer_to_read][0],
-            )
-        base_layers[layer_to_read] = gpd.read_file(map_path)
-    return base_layers
+    else:
+        map_path = os.path.join(
+            data_path,
+            "OS_base_maps",
+            "OS OpenMap Local (ESRI Shape File) TQ",
+            "data",
+            base_layers_configs[layer_name][0],
+        )
+    layer = gpd.read_file(map_path)
+    return layer
 
 
 # Put plotter functions in a dictionary to call them more easily
@@ -736,31 +754,14 @@ plotter_functions_dict = {
 }
 
 
-def convert_crop_base_map_layers(base_layers):
+def convert_crop_base_map_layers(layer):
     """Crop the base_map_layers to the London area"""
 
-    lims_gs = gpd.GeoSeries(
-        [
-            shapely.geometry.Point(x_lims_broader[0], y_lims_broader[0]),
-            shapely.geometry.Point(x_lims_broader[0], y_lims_broader[1]),
-            shapely.geometry.Point(x_lims_broader[1], y_lims_broader[0]),
-            shapely.geometry.Point(x_lims_broader[1], y_lims_broader[1]),
-        ]
-    )
-    lims_gs = lims_gs.set_crs("epsg:3395")
-    lims_gs = lims_gs.to_crs("epsg:27700")
+    layer = crop(layer, x_lims, y_lims)
+    layer["geometry"] = layer["geometry"].to_crs("epsg:4326")  # Mercator
+    # After cropping, convert to Mercator
 
-    lims = list(lims_gs.total_bounds)
-
-    for key, value in base_layers.items():
-        logger.info("Cropping " + key + " layer to London area")
-        base_layers[key] = base_layers[key].cx[
-            lims[0] : lims[2],
-            lims[1] : lims[3],
-        ]
-        logger.info("Converting coordinates in " + key)
-        base_layers[key]["geometry"] = base_layers[key]["geometry"].to_crs("epsg:3395")  # Mercator
-    return base_layers
+    return layer
 
 
 def get_speeds(lats, lngs, times):
@@ -813,11 +814,24 @@ def read_in_convert_base_maps(map_configs):
     # CONSTRUCT THE BASE layers - read the data in, set the colours and convert to Mercator projections
     #
 
+    base_layers = {}
+
     # Find exactly which layers are needed, read them in
     layers_to_read = which_layers_needed(map_configs)
-    base_layers = read_in_required_layers(layers_to_read)
-    # Convert required layers to Mercator projection, crop layers down
-    base_layers = convert_crop_base_map_layers(base_layers)
+
+    for layer_name in layers_to_read:
+        if f"{layer_name}.shp" not in os.listdir(os.path.join(data_path, "cropped_maps")):
+            logger.info(f"Reading in original file for {layer_name} map")
+            layer = read_in_original_file(layer_name)
+            logger.info(f"Cropping and converting original map for {layer_name} map")
+            layer = convert_crop_base_map_layers(layer)
+            logger.info(f"Saving processed {layer_name} map")
+            layer.to_file(os.path.join(data_path, "cropped_maps", f"{layer_name}.shp"))
+            base_layers[layer_name] = layer
+        else:
+            logger.info(f"Reading in processed {layer_name} map")
+            base_layers[layer_name] = gpd.read_file(os.path.join(data_path, "cropped_maps", f"{layer_name}.shp"))
+
     return base_layers
 
 
@@ -973,8 +987,6 @@ def convert_to_gdf(track):
 
     new_points = [shapely.geometry.Point(xy) for xy in zip(lngs, lats)]
     new_point_gdf = gpd.GeoDataFrame(crs="epsg:4326", geometry=new_points)
-    new_point_gdf = new_point_gdf.to_crs(crs="epsg:3395")
-
     return new_point_gdf, speeds
 
 
@@ -1216,7 +1228,7 @@ def make_final_by_year_image(runstr, counters, maps_dict, map_configs):
 
     # Save the final by_year image - done separately to the other image formats below,
     # due to the difference in filename
-    if map_configs["by_year"]["plotting_or_not"]:
+    if "by_year" in map_configs.keys():
         filename = os.path.join(
             os.path.join(data_path, "results"),
             runstr + "_cycling_in_year_" + counters["journey_year"] + "_to_date.png",
@@ -1228,15 +1240,14 @@ def make_final_by_year_image(runstr, counters, maps_dict, map_configs):
     # Save the final images
     logger.info("Saving the final images...")
     for map_scheme_name, map_scheme_configs in map_configs.items():
-        if map_scheme_configs["final_figure_output"] and map_scheme_configs["plotting_or_not"]:
-            filename = os.path.join(
-                os.path.join(data_path, "results"),
-                runstr + "_" + map_scheme_name + "__first_" + str(counters["n_journeys_plotted"]) + "_journeys.png",
-            )
-            maps_dict[map_scheme_name][0].savefig(
-                filename,
-                bbox_inches="tight",
-            )
+        filename = os.path.join(
+            os.path.join(data_path, "results"),
+            runstr + "_" + map_scheme_name + "__first_" + str(counters["n_journeys_plotted"]) + "_journeys.png",
+        )
+        maps_dict[map_scheme_name][0].savefig(
+            filename,
+            bbox_inches="tight",
+        )
 
 
 def additional_frames_journeys_fading_out(journey_files, maps_dict, journey_plots, counters, map_configs):
@@ -1244,7 +1255,7 @@ def additional_frames_journeys_fading_out(journey_files, maps_dict, journey_plot
     # todo: refactor function
     if making_videos:
         index = 0
-        if map_configs["running_recents"]["plotting_or_not"]:
+        if "running_recents" in map_configs.keys():
             timestr = counters["first_year"] + " - " + journey_files[-1].split("-")[0]
             # journey_plots_for_moving_recents defined above, and written to in the plotter_moving_recents function
             number_plots_to_do = len(journey_plots["journey_plots_for_moving_recents"])
@@ -1280,7 +1291,7 @@ def additional_frames_journeys_fading_out(journey_files, maps_dict, journey_plot
     # Add on some more frames to bubbling, where older journey_files disappear one by one
     if making_videos:
         index = 0
-        if map_configs["overall_bubbling_off"]["plotting_or_not"]:
+        if "overall_bubbling_off" in map_configs.keys():
             timestr = counters["first_year"] + " - " + journey_files[-1].split("-")[0]
             # journey_plots_for_moving_recents defined above, and written to in the plotter_moving_recents function
             number_plots_to_do = len(journey_plots["journey_plots_bubbling"])
@@ -1324,7 +1335,7 @@ def additional_frames_journeys_fading_out(journey_files, maps_dict, journey_plot
     # Add on some more frames to journey_plots['end_points_bubbling'], where older journey_files disappear one by one
     if making_videos:
         index = 0
-        if map_configs["end_points_bubbling"]["plotting_or_not"]:
+        if "end_points_bubbling" in map_configs.keys():
             timestr = counters["first_year"] + " - " + journey_files[-1].split("-")[0]
             # journey_plots_for_moving_recents defined above, and written to in the plotter_moving_recents function
             number_plots_to_do = len(journey_plots["end_points_bubbling"])
@@ -1368,7 +1379,7 @@ def additional_frames_journeys_fading_out(journey_files, maps_dict, journey_plot
     # Add on some more frames to shrinking, where older gradually shrink
     if making_videos:
         index = 0
-        if map_configs["overall_shrinking"]["plotting_or_not"]:
+        if "overall_shrinking" in map_configs.keys():
             timestr = counters["first_year"] + " - " + journey_files[-1].split("-")[0]
             # journey_plots_for_moving_recents defined above, and written to in the plotter_moving_recents function
             print("")
@@ -1415,7 +1426,7 @@ def additional_frames_journeys_fading_out(journey_files, maps_dict, journey_plot
     # Add on some more frames to journey_plots['end_points_shrinking'], where older gradually shrink
     if making_videos:
         index = 0
-        if map_configs["end_points_shrinking"]["plotting_or_not"]:
+        if "end_points_shrinking" in map_configs.keys():
             timestr = counters["first_year"] + " - " + journey_files[-1].split("-")[0]
             # journey_plots_for_moving_recents defined above, and written to in the plotter_moving_recents function
             print("")
@@ -1464,8 +1475,7 @@ def make_all_videos(runstr, counters, map_configs):
     # Make the videos
     if making_videos:
         for map_scheme_name, map_scheme_configs in map_configs.items():
-            if map_scheme_configs["plotting_or_not"]:
-                make_video(map_scheme_name, runstr, counters["n_journeys_plotted"])
+            make_video(map_scheme_name, runstr, counters["n_journeys_plotted"])
 
 
 def clear_out_images_for_video_folder(making_videos):
@@ -1497,9 +1507,8 @@ def overall_run_notes(
     outputs_str += "Plots made:\n"
 
     for map_scheme_name, map_scheme_configs in map_configs.items():
-        if map_scheme_configs["plotting_or_not"]:
-            outputs_str += map_scheme_name
-            outputs_str += "\n"
+        outputs_str += map_scheme_name
+        outputs_str += "\n"
 
     outputs_str += "\n" + str(counters["n_journeys_attempted"]) + " journey plots attempted"
     outputs_str += "\n" + str(counters["n_journeys_plotted"]) + " journeys successfully plotted"
