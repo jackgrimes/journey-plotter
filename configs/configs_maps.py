@@ -5,7 +5,7 @@ import numpy as np
 
 # Set area of interest - currently set to London - is WGS 84/epsg:4326 format
 x_lims = (-0.23161763999482177, 0.023482985785112587)
-y_lims = (51.449560897899204, 51.56880526758946)
+y_lims = (51.449560897899204, 51.566634677359474)
 
 x_lims_broader = tuple(np.mean(x_lims) + ((x_lims - np.mean(x_lims)) * 2))
 y_lims_broader = tuple(np.mean(y_lims) + ((y_lims - np.mean(y_lims)) * 2))
