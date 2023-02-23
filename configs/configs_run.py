@@ -5,7 +5,7 @@ import numpy as np
 
 # Set which maps you want to create
 which_maps_to_make = {
-    "overall": False,
+    "overall": True,
     "running_recents": False,
     "dark": False,
     "overall_alpha_1": True,

@@ -1294,7 +1294,6 @@ def additional_frames_journeys_fading_out(
                     maps_dict["running_recents"][0].savefig(
                         filename,
                         bbox_inches="tight",
-                        ax=maps_dict["running_recents"][1],
                     )
                 index += 1
 
@@ -1336,7 +1335,6 @@ def additional_frames_journeys_fading_out(
                     maps_dict["overall_bubbling_off"][0].savefig(
                         filename,
                         bbox_inches="tight",
-                        ax=maps_dict["overall_bubbling_off"][1],
                     )
                 index += 1
 
@@ -1378,7 +1376,6 @@ def additional_frames_journeys_fading_out(
                     maps_dict["end_points_bubbling"][0].savefig(
                         filename,
                         bbox_inches="tight",
-                        ax=maps_dict["end_points_bubbling"][1],
                     )
                 index += 1
 
@@ -1427,7 +1424,6 @@ def additional_frames_journeys_fading_out(
                     maps_dict["overall_shrinking"][0].savefig(
                         filename,
                         bbox_inches="tight",
-                        ax=maps_dict["overall_shrinking"][1],
                     )
                 index += 1
 
@@ -1474,7 +1470,6 @@ def additional_frames_journeys_fading_out(
                     maps_dict["end_points_shrinking"][0].savefig(
                         filename,
                         bbox_inches="tight",
-                        ax=maps_dict["end_points_shrinking"][1],
                     )
                 index += 1
 
