@@ -904,7 +904,7 @@ def make_all_other_frames(
 
     n_journey_files = len(journey_files)
 
-    for i, journey in tqdm(enumerate(journey_files)):
+    for i, journey in tqdm(enumerate(journey_files), total=len(journey_files)):
         # for the dark_colours_by_time plot
         journey_colour_score = i / n_journey_files
 
