@@ -142,18 +142,18 @@ def make_video(which_set_of_images, runstr, n_journeys_plotted):
 
 
 def pack_up_returns(
-    journey_plots_for_moving_recents,
-    journey_plots_for_by_year,
-    journey_plots_shrinking,
-    journey_plots_bubbling,
+    running_recents,
+    by_year,
+    overall_shrinking,
+    overall_bubbling_off,
     end_points_bubbling,
     end_points_shrinking,
 ):
     return {
-        "journey_plots_for_moving_recents": journey_plots_for_moving_recents,
-        "journey_plots_for_by_year": journey_plots_for_by_year,
-        "journey_plots_shrinking": journey_plots_shrinking,
-        "journey_plots_bubbling": journey_plots_bubbling,
+        "running_recents": running_recents,
+        "by_year": by_year,
+        "overall_shrinking": overall_shrinking,
+        "overall_bubbling_off": overall_bubbling_off,
         "end_points_bubbling": end_points_bubbling,
         "end_points_shrinking": end_points_shrinking,
     }
@@ -162,443 +162,232 @@ def pack_up_returns(
 def plotter_total(inputs):
     """For plotting the points on the total_fig map"""
 
-    # Unpack inputs
-    set_of_points = inputs["set_of_points"]
-    ax = inputs["ax"]
-    journey_plots_for_moving_recents = inputs["journey_plots_for_moving_recents"]
-    journey_plots_for_by_year = inputs["journey_plots_for_by_year"]
-    colors = inputs["colors"]
-    journey_plots_shrinking = inputs["journey_plots_shrinking"]
-    journey_plots_bubbling = inputs["journey_plots_bubbling"]
-    end_points_bubbling = inputs["end_points_bubbling"]
-    end_points_shrinking = inputs["end_points_shrinking"]
-
-    set_of_points.plot(
-        categorical=False, legend=False, ax=ax, color=colors, alpha=0.1, markersize=0.2
+    inputs["set_of_points"].plot(
+        categorical=False,
+        legend=False,
+        ax=inputs["ax"],
+        color=inputs["colors"],
+        alpha=0.1,
+        markersize=0.2,
     )
-
-    # Pack up returns
-
-    returns = pack_up_returns(
-        journey_plots_for_moving_recents,
-        journey_plots_for_by_year,
-        journey_plots_shrinking,
-        journey_plots_bubbling,
-        end_points_bubbling,
-        end_points_shrinking,
-    )
-
-    return returns
+    return inputs
 
 
 def plotter_moving_recents(inputs):
     """For plotting the points on the moving_recents_fig map"""
 
-    # Unpack inputs
-    set_of_points = inputs["set_of_points"]
-    ax = inputs["ax"]
-    journey_plots_for_moving_recents = inputs["journey_plots_for_moving_recents"]
-    journey_plots_for_by_year = inputs["journey_plots_for_by_year"]
-    n_concurrent = inputs["n_concurrent"]
-    colors = inputs["colors"]
-    journey_plots_shrinking = inputs["journey_plots_shrinking"]
-    journey_plots_bubbling = inputs["journey_plots_bubbling"]
-    end_points_bubbling = inputs["end_points_bubbling"]
-    end_points_shrinking = inputs["end_points_shrinking"]
-
     lats = []
     lngs = []
 
-    for index, row in set_of_points.iterrows():
+    for index, row in inputs["set_of_points"].iterrows():
         lngs.append(row.geometry.x)
         lats.append(row.geometry.y)
 
-    journey_plots_for_moving_recents.append(
-        ax.scatter(lngs, lats, color=colors, s=3, marker="s", alpha=0.05)
+    inputs["running_recents"].append(
+        inputs["ax"].scatter(
+            lngs, lats, color=inputs["colors"], s=3, marker="s", alpha=0.05
+        )
     )
 
-    if len(journey_plots_for_moving_recents) > n_concurrent:
-        n_to_remove = len(journey_plots_for_moving_recents) - n_concurrent
+    if len(inputs["running_recents"]) > inputs["n_concurrent"]:
+        n_to_remove = len(inputs["running_recents"]) - inputs["n_concurrent"]
         for i in range(n_to_remove):
-            journey_plots_for_moving_recents[i].remove()
-        for j in range(n_to_remove):
-            del journey_plots_for_moving_recents[j]
+            inputs["running_recents"][i].remove()
+            del inputs["running_recents"][i]
 
-    # Pack up returns
-
-    returns = pack_up_returns(
-        journey_plots_for_moving_recents,
-        journey_plots_for_by_year,
-        journey_plots_shrinking,
-        journey_plots_bubbling,
-        end_points_bubbling,
-        end_points_shrinking,
-    )
-
-    return returns
+    return inputs
 
 
 def plotter_by_year(inputs):
     """For plotting the points on the by_year map"""
 
-    # Unpack inputs
-    journey_year_change = inputs["journey_year_change"]
-    set_of_points = inputs["set_of_points"]
-    ax = inputs["ax"]
-    journey_plots_for_moving_recents = inputs["journey_plots_for_moving_recents"]
-    journey_plots_for_by_year = inputs["journey_plots_for_by_year"]
-    colors = inputs["colors"]
-    journey_plots_shrinking = inputs["journey_plots_shrinking"]
-    journey_plots_bubbling = inputs["journey_plots_bubbling"]
-    end_points_bubbling = inputs["end_points_bubbling"]
-    end_points_shrinking = inputs["end_points_shrinking"]
-
     lats = []
     lngs = []
 
-    for index, row in set_of_points.iterrows():
+    for index, row in inputs["set_of_points"].iterrows():
         lngs.append(row.geometry.x)
         lats.append(row.geometry.y)
 
-    if journey_year_change:
-        for i in range(len(journey_plots_for_by_year)):
-            journey_plots_for_by_year[i].remove()
-        journey_plots_for_by_year = []
+    if inputs["journey_year_change"]:
+        for i in range(len(inputs["by_year"])):
+            inputs["by_year"][i].remove()
+        inputs["by_year"] = []
 
-    journey_plots_for_by_year.append(
-        ax.scatter(lngs, lats, color=colors, s=2, marker="s", alpha=1)
+    inputs["by_year"].append(
+        inputs["ax"].scatter(
+            lngs, lats, color=inputs["colors"], s=2, marker="s", alpha=1
+        )
     )
 
-    # Pack up returns
-
-    returns = pack_up_returns(
-        journey_plots_for_moving_recents,
-        journey_plots_for_by_year,
-        journey_plots_shrinking,
-        journey_plots_bubbling,
-        end_points_bubbling,
-        end_points_shrinking,
-    )
-
-    return returns
+    return inputs
 
 
 def plotter_all_journeys_thick(inputs):
     """For plotting the points on the by_year map"""
 
-    # Unpack inputs
-    set_of_points = inputs["set_of_points"]
-    ax = inputs["ax"]
-    journey_plots_for_moving_recents = inputs["journey_plots_for_moving_recents"]
-    journey_plots_for_by_year = inputs["journey_plots_for_by_year"]
-    colors = inputs["colors"]
-    journey_plots_shrinking = inputs["journey_plots_shrinking"]
-    journey_plots_bubbling = inputs["journey_plots_bubbling"]
-    end_points_bubbling = inputs["end_points_bubbling"]
-    end_points_shrinking = inputs["end_points_shrinking"]
-
     lats = []
     lngs = []
 
-    for index, row in set_of_points.iterrows():
+    for index, row in inputs["set_of_points"].iterrows():
         lngs.append(row.geometry.x)
         lats.append(row.geometry.y)
 
-    ax.scatter(lngs, lats, color=colors, s=2, marker="s", alpha=1)
+    inputs["ax"].scatter(lngs, lats, color=inputs["colors"], s=2, marker="s", alpha=1)
 
-    # Pack up returns
-
-    returns = pack_up_returns(
-        journey_plots_for_moving_recents,
-        journey_plots_for_by_year,
-        journey_plots_shrinking,
-        journey_plots_bubbling,
-        end_points_bubbling,
-        end_points_shrinking,
-    )
-
-    return returns
+    return inputs
 
 
 def plotter_no_roads(inputs):
     """For plotting the points on the total_fig_no_roads map"""
-
-    # Unpack inputs
-    set_of_points = inputs["set_of_points"]
-    ax = inputs["ax"]
-    journey_plots_for_moving_recents = inputs["journey_plots_for_moving_recents"]
-    journey_plots_for_by_year = inputs["journey_plots_for_by_year"]
-    journey_plots_shrinking = inputs["journey_plots_shrinking"]
-    journey_plots_bubbling = inputs["journey_plots_bubbling"]
-    end_points_bubbling = inputs["end_points_bubbling"]
-    end_points_shrinking = inputs["end_points_shrinking"]
-
-    set_of_points.plot(
-        categorical=False, legend=False, ax=ax, color="white", alpha=0.1, markersize=0.1
+    inputs["set_of_points"].plot(
+        categorical=False,
+        legend=False,
+        ax=inputs["ax"],
+        color="white",
+        alpha=0.1,
+        markersize=0.1,
     )
-    # Pack up returns
-
-    returns = {
-        "journey_plots_for_moving_recents": journey_plots_for_moving_recents,
-        "journey_plots_for_by_year": journey_plots_for_by_year,
-        "journey_plots_shrinking": journey_plots_shrinking,
-        "journey_plots_bubbling": journey_plots_bubbling,
-        "end_points_bubbling": end_points_bubbling,
-        "end_points_shrinking": end_points_shrinking,
-    }
-
-    return returns
+    return inputs
 
 
 def plotter_dark_colours_by_time(inputs):
     """For plotting the points on the dark_colours_by_time map"""
 
-    # Unpack inputs
+    colors = scalarMap_time.to_rgba(inputs["journey_colour_score"] * 0.85)
 
-    set_of_points = inputs["set_of_points"]
-    ax = inputs["ax"]
-    journey_plots_for_moving_recents = inputs["journey_plots_for_moving_recents"]
-    journey_plots_for_by_year = inputs["journey_plots_for_by_year"]
-
-    journey_colour_score = inputs["journey_colour_score"]
-    journey_plots_shrinking = inputs["journey_plots_shrinking"]
-    journey_plots_bubbling = inputs["journey_plots_bubbling"]
-    end_points_bubbling = inputs["end_points_bubbling"]
-    end_points_shrinking = inputs["end_points_shrinking"]
-
-    colors = scalarMap_time.to_rgba(journey_colour_score * 0.85)
-
-    set_of_points.plot(
-        categorical=False, legend=False, ax=ax, color=colors, alpha=0.06, markersize=0.3
-    )
-    # Pack up returns
-
-    returns = pack_up_returns(
-        journey_plots_for_moving_recents,
-        journey_plots_for_by_year,
-        journey_plots_shrinking,
-        journey_plots_bubbling,
-        end_points_bubbling,
-        end_points_shrinking,
+    inputs["set_of_points"].plot(
+        categorical=False,
+        legend=False,
+        ax=inputs["ax"],
+        color=scalarMap_time.to_rgba(inputs["journey_colour_score"] * 0.85),
+        alpha=0.06,
+        markersize=0.3,
     )
 
-    return returns
+    return inputs
 
 
 def plotter_alpha_one(inputs):
     """For plotting the points on the total_fig_alpha_1 map"""
 
-    # Unpack inputs
-
-    set_of_points = inputs["set_of_points"]
-    ax = inputs["ax"]
-    journey_plots_for_moving_recents = inputs["journey_plots_for_moving_recents"]
-    journey_plots_for_by_year = inputs["journey_plots_for_by_year"]
-    colors = inputs["colors"]
-    journey_plots_shrinking = inputs["journey_plots_shrinking"]
-    journey_plots_bubbling = inputs["journey_plots_bubbling"]
-    end_points_bubbling = inputs["end_points_bubbling"]
-    end_points_shrinking = inputs["end_points_shrinking"]
-
-    set_of_points.plot(
-        categorical=False, legend=False, ax=ax, color=colors, alpha=1, markersize=0.05
+    inputs["set_of_points"].plot(
+        categorical=False,
+        legend=False,
+        ax=inputs["ax"],
+        color=inputs["colors"],
+        alpha=1,
+        markersize=0.05,
     )
-    # Pack up returns
-
-    returns = pack_up_returns(
-        journey_plots_for_moving_recents,
-        journey_plots_for_by_year,
-        journey_plots_shrinking,
-        journey_plots_bubbling,
-        end_points_bubbling,
-        end_points_shrinking,
-    )
-
-    return returns
+    return inputs
 
 
 def plotter_all_journeys_shrinking(inputs):
     """For plotting the points on the moving_recents_fig map"""
 
-    # Unpack inputs
-
-    set_of_points = inputs["set_of_points"]
-    ax = inputs["ax"]
-    journey_plots_for_moving_recents = inputs["journey_plots_for_moving_recents"]
-    journey_plots_for_by_year = inputs["journey_plots_for_by_year"]
-    colors = inputs["colors"]
-    journey_plots_shrinking = inputs["journey_plots_shrinking"]
-    journey_plots_bubbling = inputs["journey_plots_bubbling"]
-    end_points_bubbling = inputs["end_points_bubbling"]
-    end_points_shrinking = inputs["end_points_shrinking"]
-
     lats = []
     lngs = []
 
-    for index, row in set_of_points.iterrows():
+    for index, row in inputs["set_of_points"].iterrows():
         lngs.append(row.geometry.x)
         lats.append(row.geometry.y)
 
-    journey_plots_shrinking.append(
-        ax.scatter(
+    inputs["overall_shrinking"].append(
+        inputs["ax"].scatter(
             lngs,
             lats,
-            color=colors,
+            color=inputs["colors"],
             s=50,
             # marker="s",
             alpha=0.4,
         )
     )
 
-    if len(journey_plots_shrinking) > 0:
-        for points in journey_plots_shrinking:
+    if len(inputs["overall_shrinking"]) > 0:
+        for points in inputs["overall_shrinking"]:
             if points._sizes > 1:
                 points.set_sizes(points._sizes * 0.95)
                 points.set_alpha(points._alpha * 0.99)
 
-    # Pack up returns
-
-    returns = pack_up_returns(
-        journey_plots_for_moving_recents,
-        journey_plots_for_by_year,
-        journey_plots_shrinking,
-        journey_plots_bubbling,
-        end_points_bubbling,
-        end_points_shrinking,
-    )
-
-    return returns
+    return inputs
 
 
 def plotter_all_journeys_bubbling_off(inputs):
     """For plotting the points on the moving_recents_fig map"""
 
-    # Unpack inputs
-
-    set_of_points = inputs["set_of_points"]
-    ax = inputs["ax"]
-    journey_plots_for_moving_recents = inputs["journey_plots_for_moving_recents"]
-    journey_plots_for_by_year = inputs["journey_plots_for_by_year"]
-    colors = inputs["colors"]
-    journey_plots_shrinking = inputs["journey_plots_shrinking"]
-    journey_plots_bubbling = inputs["journey_plots_bubbling"]
-    end_points_bubbling = inputs["end_points_bubbling"]
-    end_points_shrinking = inputs["end_points_shrinking"]
-    n_concurrent_bubbling = inputs["n_concurrent_bubbling"]
-
     lats = []
     lngs = []
 
-    for index, row in set_of_points.iterrows():
+    for index, row in inputs["set_of_points"].iterrows():
         lngs.append(row.geometry.x)
         lats.append(row.geometry.y)
 
-    journey_plots_bubbling.append(
-        ax.scatter(
+    inputs["overall_bubbling_off"].append(
+        inputs["ax"].scatter(
             lngs,
             lats,
-            color=colors,
+            color=inputs["colors"],
             s=10,
             # marker="s",
             alpha=1,
         )
     )
 
-    for i in range(len(journey_plots_bubbling)):
-        journey_plots_bubbling[i].set_sizes(journey_plots_bubbling[i]._sizes * 1.2)
-        if journey_plots_bubbling[i]._alpha > 0.0005:
-            journey_plots_bubbling[i].set_alpha(journey_plots_bubbling[i]._alpha * 0.82)
+    for i in range(len(inputs["overall_bubbling_off"])):
+        inputs["overall_bubbling_off"][i].set_sizes(
+            inputs["overall_bubbling_off"][i]._sizes * 1.2
+        )
+        if inputs["overall_bubbling_off"][i]._alpha > 0.0005:
+            inputs["overall_bubbling_off"][i].set_alpha(
+                inputs["overall_bubbling_off"][i]._alpha * 0.82
+            )
 
-    if len(journey_plots_bubbling) > n_concurrent_bubbling:
-        n_to_remove = len(journey_plots_bubbling) - n_concurrent_bubbling
+    if len(inputs["overall_bubbling_off"]) > inputs["n_concurrent_bubbling"]:
+        n_to_remove = (
+            len(inputs["overall_bubbling_off"]) - inputs["n_concurrent_bubbling"]
+        )
         for i in range(n_to_remove):
-            journey_plots_bubbling[i].remove()
+            inputs["overall_bubbling_off"][i].remove()
         for j in range(n_to_remove):
-            del journey_plots_bubbling[j]
+            del inputs["overall_bubbling_off"][j]
 
-    # Pack up returns
-
-    returns = pack_up_returns(
-        journey_plots_for_moving_recents,
-        journey_plots_for_by_year,
-        journey_plots_shrinking,
-        journey_plots_bubbling,
-        end_points_bubbling,
-        end_points_shrinking,
-    )
-
-    return returns
+    return inputs
 
 
 def plotter_end_points(inputs):
     """For plotting the points on the total_fig_alpha_1 map"""
 
-    # Unpack inputs
-
-    set_of_points = inputs["set_of_points"]
-    ax = inputs["ax"]
-    journey_plots_for_moving_recents = inputs["journey_plots_for_moving_recents"]
-    journey_plots_for_by_year = inputs["journey_plots_for_by_year"]
-    journey_plots_shrinking = inputs["journey_plots_shrinking"]
-    journey_plots_bubbling = inputs["journey_plots_bubbling"]
-    end_points_bubbling = inputs["end_points_bubbling"]
-    end_points_shrinking = inputs["end_points_shrinking"]
-
     # Get first and last points
     lngs = [
-        set_of_points.geometry[0].x,
-        set_of_points.geometry[len(set_of_points.geometry) - 1].x,
+        inputs["set_of_points"].geometry[0].x,
+        inputs["set_of_points"].geometry[len(inputs["set_of_points"].geometry) - 1].x,
     ]
     lats = [
-        set_of_points.geometry[0].y,
-        set_of_points.geometry[len(set_of_points.geometry) - 1].y,
+        inputs["set_of_points"].geometry[0].y,
+        inputs["set_of_points"].geometry[len(inputs["set_of_points"].geometry) - 1].y,
     ]
 
     new_points = [shapely.geometry.Point(xy) for xy in zip(lngs, lats)]
 
-    ax.scatter(lngs, lats, color=["green", "blue"], s=6, alpha=0.4)
+    inputs["ax"].scatter(lngs, lats, color=["green", "blue"], s=6, alpha=0.4)
 
-    # Pack up returns
-
-    journey_plots = pack_up_returns(
-        journey_plots_for_moving_recents,
-        journey_plots_for_by_year,
-        journey_plots_shrinking,
-        journey_plots_bubbling,
-        end_points_bubbling,
-        end_points_shrinking,
-    )
-
-    return journey_plots
+    return inputs
 
 
 def plotter_end_points_bubbling_off(inputs):
     """For plotting the points on the moving_recents_fig map"""
 
-    # Unpack inputs
-
-    set_of_points = inputs["set_of_points"]
-    ax = inputs["ax"]
-    journey_plots_for_moving_recents = inputs["journey_plots_for_moving_recents"]
-    journey_plots_for_by_year = inputs["journey_plots_for_by_year"]
-    journey_plots_shrinking = inputs["journey_plots_shrinking"]
-    journey_plots_bubbling = inputs["journey_plots_bubbling"]
-    end_points_bubbling = inputs["end_points_bubbling"]
-    end_points_shrinking = inputs["end_points_shrinking"]
-    n_concurrent_bubbling_end_points = inputs["n_concurrent_bubbling_end_points"]
-
     # Get first and last points
     lngs = [
-        set_of_points.geometry[0].x,
-        set_of_points.geometry[len(set_of_points.geometry) - 1].x,
+        inputs["set_of_points"].geometry[0].x,
+        inputs["set_of_points"].geometry[len(inputs["set_of_points"].geometry) - 1].x,
     ]
     lats = [
-        set_of_points.geometry[0].y,
-        set_of_points.geometry[len(set_of_points.geometry) - 1].y,
+        inputs["set_of_points"].geometry[0].y,
+        inputs["set_of_points"].geometry[len(inputs["set_of_points"].geometry) - 1].y,
     ]
 
-    end_points_bubbling.append(
-        ax.scatter(
+    inputs["end_points_bubbling"].append(
+        inputs["ax"].scatter(
             lngs,
             lats,
             color=["green", "blue"],
@@ -608,57 +397,43 @@ def plotter_end_points_bubbling_off(inputs):
         )
     )
 
-    for i in range(len(end_points_bubbling)):
-        end_points_bubbling[i].set_sizes(end_points_bubbling[i]._sizes * 1.1)
-        if end_points_bubbling[i]._alpha > 0.0005:
-            end_points_bubbling[i].set_alpha(end_points_bubbling[i]._alpha * 0.95)
+    for i in range(len(inputs["end_points_bubbling"])):
+        inputs["end_points_bubbling"][i].set_sizes(
+            inputs["end_points_bubbling"][i]._sizes * 1.1
+        )
+        if inputs["end_points_bubbling"][i]._alpha > 0.0005:
+            inputs["end_points_bubbling"][i].set_alpha(
+                inputs["end_points_bubbling"][i]._alpha * 0.95
+            )
 
-    if len(end_points_bubbling) > n_concurrent_bubbling_end_points:
-        n_to_remove = len(end_points_bubbling) - n_concurrent_bubbling_end_points
+    if len(inputs["end_points_bubbling"]) > inputs["n_concurrent_bubbling_end_points"]:
+        n_to_remove = (
+            len(inputs["end_points_bubbling"])
+            - inputs["n_concurrent_bubbling_end_points"]
+        )
         for i in range(n_to_remove):
-            end_points_bubbling[i].remove()
+            inputs["end_points_bubbling"][i].remove()
         for j in range(n_to_remove):
-            del end_points_bubbling[j]
+            del inputs["end_points_bubbling"][j]
 
-    # Pack up returns
-
-    returns = pack_up_returns(
-        journey_plots_for_moving_recents,
-        journey_plots_for_by_year,
-        journey_plots_shrinking,
-        journey_plots_bubbling,
-        end_points_bubbling,
-        end_points_shrinking,
-    )
-
-    return returns
+    return inputs
 
 
 def plotter_end_points_shrinking(inputs):
     """For plotting the points on the moving_recents_fig map"""
 
-    # Unpack inputs
-    set_of_points = inputs["set_of_points"]
-    ax = inputs["ax"]
-    journey_plots_for_moving_recents = inputs["journey_plots_for_moving_recents"]
-    journey_plots_for_by_year = inputs["journey_plots_for_by_year"]
-    journey_plots_shrinking = inputs["journey_plots_shrinking"]
-    journey_plots_bubbling = inputs["journey_plots_bubbling"]
-    end_points_bubbling = inputs["end_points_bubbling"]
-    end_points_shrinking = inputs["end_points_shrinking"]
-
     # Get first and last points
     lngs = [
-        set_of_points.geometry[0].x,
-        set_of_points.geometry[len(set_of_points.geometry) - 1].x,
+        inputs["set_of_points"].geometry[0].x,
+        inputs["set_of_points"].geometry[len(inputs["set_of_points"].geometry) - 1].x,
     ]
     lats = [
-        set_of_points.geometry[0].y,
-        set_of_points.geometry[len(set_of_points.geometry) - 1].y,
+        inputs["set_of_points"].geometry[0].y,
+        inputs["set_of_points"].geometry[len(inputs["set_of_points"].geometry) - 1].y,
     ]
 
-    end_points_shrinking.append(
-        ax.scatter(
+    inputs["end_points_shrinking"].append(
+        inputs["ax"].scatter(
             lngs,
             lats,
             color=["green", "blue"],
@@ -668,24 +443,13 @@ def plotter_end_points_shrinking(inputs):
         )
     )
 
-    if len(end_points_shrinking) > 0:
-        for points in end_points_shrinking:
+    if len(inputs["end_points_shrinking"]) > 0:
+        for points in inputs["end_points_shrinking"]:
             if points._sizes > 10:
                 points.set_sizes(points._sizes * 0.90)
                 points.set_alpha(points._alpha * 0.985)
 
-    # Pack up returns
-
-    returns = pack_up_returns(
-        journey_plots_for_moving_recents,
-        journey_plots_for_by_year,
-        journey_plots_shrinking,
-        journey_plots_bubbling,
-        end_points_bubbling,
-        end_points_shrinking,
-    )
-
-    return returns
+    return inputs
 
 
 def which_layers_needed(map_configs):
@@ -888,12 +652,10 @@ def plot_base_map_layers(base_layers, map_configs):
 
 
 def parse_the_args():
-    parser = argparse.ArgumentParser(description="Process some integers.")
+    parser = argparse.ArgumentParser(description="Journey plotter argparser")
     parser.add_argument(
-        "--no_journeys", type=str, default="", help="How many journeys to include?"
-    )
-    parser.add_argument(
-        "--is_debug",
+        "--debug",
+        "-d",
         default=False,
         type=lambda x: (str(x).lower() == "true"),
         help="Running a faster version of code for debugging?",
@@ -901,7 +663,7 @@ def parse_the_args():
     return parser.parse_args()
 
 
-def get_journey_files(no_journeys):
+def get_journey_files(n_journeys=None):
 
     logger.info("Getting the journey files")
 
@@ -909,14 +671,10 @@ def get_journey_files(no_journeys):
         [x for x in os.listdir(os.path.join(data_path, "cycling_data")) if ".gpx" in x]
     )
 
-    if no_journeys == "":
-        no_journeys = len(journey_files)
-        attempting_all = True
-    else:
-        no_journeys = int(no_journeys)
-        attempting_all = False
+    if n_journeys is not None:
+        journey_files = journey_files[:n_journeys]
 
-    return journey_files, no_journeys, attempting_all
+    return journey_files
 
 
 def make_first_frames(counters, journeys, text_vars, maps_dict, map_configs):
@@ -1127,8 +885,6 @@ def handle_problem_parsing_gpx_file(e, counters, journey):
 
 def make_all_other_frames(
     journey_files,
-    attempting_all,
-    no_journeys,
     start_time,
     maps_dict,
     text_vars,
@@ -1146,9 +902,11 @@ def make_all_other_frames(
     }
     plotter_inputs.update(journey_plots)
 
-    for journey in tqdm(journey_files):
+    n_journey_files = len(journey_files)
+
+    for i, journey in tqdm(enumerate(journey_files)):
         # for the dark_colours_by_time plot
-        journey_colour_score = counters["n_journeys_plotted"] / no_journeys
+        journey_colour_score = i / n_journey_files
 
         try:
             track = get_track(data_path, journey)
@@ -1224,9 +982,6 @@ def make_all_other_frames(
                 counters, new_timestr, new_timestr_moving_recents
             )
 
-            if counters["n_journeys_plotted"] >= no_journeys:
-                break
-
     return counters
 
 
@@ -1262,26 +1017,26 @@ def make_final_by_year_image(counters, maps_dict, map_configs):
 
 
 def running_recents_additional_frames(journey_plots, map_configs):
-    journey_plots["journey_plots_for_moving_recents"][0].remove()
-    del journey_plots["journey_plots_for_moving_recents"][0]
+    journey_plots["running_recents"][0].remove()
+    del journey_plots["running_recents"][0]
 
-    if len(journey_plots["journey_plots_for_moving_recents"]) == 0:
+    if len(journey_plots["running_recents"]) == 0:
         map_configs["running_recents"]["additional_frames_needed"] = False
     return journey_plots, map_configs
 
 
 def overall_bubbling_off_additional_frames(journey_plots, map_configs):
-    journey_plots["journey_plots_bubbling"][0].remove()
-    del journey_plots["journey_plots_bubbling"][0]
-    for i in range(len(journey_plots["journey_plots_bubbling"])):
-        journey_plots["journey_plots_bubbling"][i].set_sizes(
-            journey_plots["journey_plots_bubbling"][i]._sizes * 1.2
+    journey_plots["overall_bubbling_off"][0].remove()
+    del journey_plots["overall_bubbling_off"][0]
+    for i in range(len(journey_plots["overall_bubbling_off"])):
+        journey_plots["overall_bubbling_off"][i].set_sizes(
+            journey_plots["overall_bubbling_off"][i]._sizes * 1.2
         )
-        if journey_plots["journey_plots_bubbling"][i]._alpha > 0.0005:
-            journey_plots["journey_plots_bubbling"][i].set_alpha(
-                journey_plots["journey_plots_bubbling"][i]._alpha * 0.82
+        if journey_plots["overall_bubbling_off"][i]._alpha > 0.0005:
+            journey_plots["overall_bubbling_off"][i].set_alpha(
+                journey_plots["overall_bubbling_off"][i]._alpha * 0.82
             )
-    if len(journey_plots["journey_plots_bubbling"]) == 0:
+    if len(journey_plots["overall_bubbling_off"]) == 0:
         map_configs["overall_bubbling_off"]["additional_frames_needed"] = False
     return journey_plots, map_configs
 
@@ -1303,23 +1058,20 @@ def end_points_bubbling_additional_frames(journey_plots, map_configs):
 
 
 def overall_shrinking_additional_frames(journey_plots, map_configs):
-    sizes = [points._sizes for points in journey_plots["journey_plots_shrinking"]]
+    sizes = [points._sizes for points in journey_plots["overall_shrinking"]]
     sizes = [size[0] for size in sizes]
     max_sizes = max(sizes)
 
     rat = 0.95
     min_size = 1
 
-    for points in journey_plots["journey_plots_shrinking"]:
+    for points in journey_plots["overall_shrinking"]:
         if points._sizes > min_size:
             points.set_sizes(points._sizes * 0.95)
             points.set_alpha(points._alpha * 0.99)
 
     if all(
-        [
-            points._sizes <= min_size
-            for points in journey_plots["journey_plots_shrinking"]
-        ]
+        [points._sizes <= min_size for points in journey_plots["overall_shrinking"]]
     ):
         map_configs["overall_shrinking"]["additional_frames_needed"] = False
     return journey_plots, map_configs
@@ -1473,10 +1225,10 @@ def set_up_plot_lists_and_counters(journeys):
     start_time = datetime.datetime.now()
 
     journey_plots = {
-        "journey_plots_for_moving_recents": [],
-        "journey_plots_for_by_year": [],
-        "journey_plots_shrinking": [],
-        "journey_plots_bubbling": [],
+        "running_recents": [],
+        "by_year": [],
+        "overall_shrinking": [],
+        "overall_bubbling_off": [],
         "end_points_shrinking": [],
         "end_points_bubbling": [],
     }
@@ -1506,7 +1258,6 @@ def set_up_plot_lists_and_counters(journeys):
 def reduce_map_configs_to_maps_being_made(map_configs, which_maps_to_make):
 
     maps_to_make = [k for k, v in which_maps_to_make.items() if v]
-
     map_configs = {k: v for k, v in map_configs.items() if k in maps_to_make}
 
     return map_configs

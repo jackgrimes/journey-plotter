@@ -1,7 +1,7 @@
 # This script plots the first n or all journeys iteratively, building up frames for a video, producing the video,
 # and keeping the final images
 
-# example debug usage python main.py --debug=True --no_journeys=20
+# example debug usage python main.py --debug=True
 # example normal usage python main.py
 
 
@@ -26,12 +26,14 @@ from utils import (
     reduce_map_configs_to_maps_being_made,
 )
 
-os.environ["PROJ_LIB"] = os.path.join(os.path.dirname(os.path.dirname(sys.executable)), "share", "proj")
+os.environ["PROJ_LIB"] = os.path.join(
+    os.path.dirname(os.path.dirname(sys.executable)), "share", "proj"
+)
 
 
-def run(no_journeys, map_configs):
+def run(map_configs, n_journeys=None):
 
-    journey_files, no_journeys, attempting_all = get_journey_files(no_journeys)
+    journey_files = get_journey_files(n_journeys)
 
     map_configs = reduce_map_configs_to_maps_being_made(map_configs, which_maps_to_make)
 
@@ -54,8 +56,6 @@ def run(no_journeys, map_configs):
 
     counters = make_all_other_frames(
         journey_files,
-        attempting_all,
-        no_journeys,
         start_time,
         maps_dict,
         text_vars,
@@ -67,7 +67,9 @@ def run(no_journeys, map_configs):
 
     make_final_by_year_image(counters, maps_dict, map_configs)
 
-    additional_frames_journeys_fading_out(journey_files, maps_dict, journey_plots, counters, map_configs)
+    additional_frames_journeys_fading_out(
+        journey_files, maps_dict, journey_plots, counters, map_configs
+    )
 
     make_all_videos(counters, map_configs)
 
@@ -75,15 +77,13 @@ def run(no_journeys, map_configs):
 
 
 if __name__ == "__main__":
-    # tqdm.pandas()
-
     args = parse_the_args()
 
-    map_configs = MAP_CONFIGS
+    if args.debug:
+        for map in MAP_CONFIGS.keys():
+            MAP_CONFIGS[map]["layers"] = ["tidal_water"]
+        n_journeys = 5
+    else:
+        n_journeys = None
 
-    if args.is_debug:
-        for k, v in map_configs.items():
-            if k != "dark":
-                map_configs[k]["plotting_or_not"] = False
-
-    run(args.no_journeys, map_configs)
+    run(map_configs=MAP_CONFIGS, n_journeys=n_journeys)
