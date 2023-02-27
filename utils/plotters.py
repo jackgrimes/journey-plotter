@@ -207,38 +207,30 @@ def plotter_all_journeys_bubbling_off(inputs):
     return inputs
 
 
-def plotter_end_points(inputs):
-    """For plotting the points on the total_fig_alpha_1 map"""
-
+def get_first_and_last_points(set_of_points):
     # Get first and last points
     lngs = [
-        inputs["set_of_points"].geometry[0].x,
-        inputs["set_of_points"].geometry[len(inputs["set_of_points"].geometry) - 1].x,
+        set_of_points.geometry[0].x,
+        set_of_points.geometry[len(set_of_points) - 1].x,
     ]
     lats = [
-        inputs["set_of_points"].geometry[0].y,
-        inputs["set_of_points"].geometry[len(inputs["set_of_points"].geometry) - 1].y,
+        set_of_points.geometry[0].y,
+        set_of_points.geometry[len(set_of_points) - 1].y,
     ]
+    return lats, lngs
 
-    new_points = [shapely.geometry.Point(xy) for xy in zip(lngs, lats)]
 
+def plotter_end_points(inputs):
+    """For plotting the points on the total_fig_alpha_1 map"""
+    lats, lngs = get_first_and_last_points(inputs["set_of_points"])
     inputs["ax"].scatter(lngs, lats, color=["green", "blue"], s=6, alpha=0.4)
-
     return inputs
 
 
 def plotter_end_points_bubbling_off(inputs):
     """For plotting the points on the moving_recents_fig map"""
 
-    # Get first and last points
-    lngs = [
-        inputs["set_of_points"].geometry[0].x,
-        inputs["set_of_points"].geometry[len(inputs["set_of_points"].geometry) - 1].x,
-    ]
-    lats = [
-        inputs["set_of_points"].geometry[0].y,
-        inputs["set_of_points"].geometry[len(inputs["set_of_points"].geometry) - 1].y,
-    ]
+    lats, lngs = get_first_and_last_points(inputs["set_of_points"])
 
     inputs["end_points_bubbling"].append(
         inputs["ax"].scatter(
@@ -276,15 +268,7 @@ def plotter_end_points_bubbling_off(inputs):
 def plotter_end_points_shrinking(inputs):
     """For plotting the points on the moving_recents_fig map"""
 
-    # Get first and last points
-    lngs = [
-        inputs["set_of_points"].geometry[0].x,
-        inputs["set_of_points"].geometry[len(inputs["set_of_points"].geometry) - 1].x,
-    ]
-    lats = [
-        inputs["set_of_points"].geometry[0].y,
-        inputs["set_of_points"].geometry[len(inputs["set_of_points"].geometry) - 1].y,
-    ]
+    lats, lngs = get_first_and_last_points(inputs["set_of_points"])
 
     inputs["end_points_shrinking"].append(
         inputs["ax"].scatter(

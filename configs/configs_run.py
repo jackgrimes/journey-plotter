@@ -6,17 +6,17 @@ import numpy as np
 # Set which maps you want to create
 which_maps_to_make = {
     "overall": True,
-    "running_recents": False,
-    "dark": False,
-    "overall_alpha_1": False,
-    "by_year": False,
-    "overall_thick": False,
-    "dark_colours_by_time": False,
-    "overall_shrinking": False,
-    "overall_bubbling_off": False,
-    "end_points": False,
-    "end_points_shrinking": False,
-    "end_points_bubbling": False,
+    "running_recents": True,
+    "dark": True,
+    "overall_alpha_1": True,
+    "by_year": True,
+    "overall_thick": True,
+    "dark_colours_by_time": True,
+    "overall_shrinking": True,
+    "overall_bubbling_off": True,
+    "end_points": True,
+    "end_points_shrinking": True,
+    "end_points_bubbling": True,
 }
 
 # Colour scheme for journeys?
