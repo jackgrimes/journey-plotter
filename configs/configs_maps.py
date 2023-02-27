@@ -45,6 +45,7 @@ MAP_CONFIGS = {
         "which_journeys": "all_journeys",
         "final_figure_output": True,
         "year_text": "black",
+        "additional_frames_needed": False
     },
     "running_recents": {
         "layers": [
@@ -57,18 +58,21 @@ MAP_CONFIGS = {
         "which_journeys": "most_recent_journeys",
         "final_figure_output": False,
         "year_text": "black",
+        "additional_frames_needed": True
     },
     "dark": {
         "layers": ["tidal_water"],
         "which_journeys": "all_journeys",
         "final_figure_output": True,
         "year_text": "dimgrey",
+        "additional_frames_needed": False
     },
     "dark_colours_by_time": {
         "layers": ["tidal_water"],
         "which_journeys": "all_journeys",
         "final_figure_output": True,
         "year_text": "dimgrey",
+        "additional_frames_needed": False
     },
     "overall_alpha_1": {
         "layers": [
@@ -81,6 +85,7 @@ MAP_CONFIGS = {
         "which_journeys": "all_journeys",
         "final_figure_output": True,
         "year_text": "black",
+        "additional_frames_needed": False
     },
     "by_year": {
         "layers": [
@@ -93,6 +98,7 @@ MAP_CONFIGS = {
         "which_journeys": "all_journeys",
         "final_figure_output": False,
         "year_text": "black",
+        "additional_frames_needed": False
     },
     "overall_thick": {
         "layers": [
@@ -105,6 +111,7 @@ MAP_CONFIGS = {
         "which_journeys": "all_journeys",
         "final_figure_output": True,
         "year_text": "black",
+        "additional_frames_needed": False
     },
     "overall_shrinking": {
         "layers": [
@@ -117,6 +124,7 @@ MAP_CONFIGS = {
         "which_journeys": "all_journeys",
         "final_figure_output": True,
         "year_text": "black",
+        "additional_frames_needed": True
     },
     "overall_bubbling_off": {
         "layers": [
@@ -129,6 +137,7 @@ MAP_CONFIGS = {
         "which_journeys": "all_journeys",
         "final_figure_output": True,
         "year_text": "black",
+        "additional_frames_needed": True
     },
     "end_points": {
         "layers": [
@@ -141,6 +150,7 @@ MAP_CONFIGS = {
         "which_journeys": "all_journeys",
         "final_figure_output": True,
         "year_text": "black",
+        "additional_frames_needed": False
     },
     "end_points_shrinking": {
         "layers": [
@@ -153,6 +163,7 @@ MAP_CONFIGS = {
         "which_journeys": "all_journeys",
         "final_figure_output": True,
         "year_text": "black",
+        "additional_frames_needed": True
     },
     "end_points_bubbling": {
         "layers": [
@@ -165,6 +176,7 @@ MAP_CONFIGS = {
         "which_journeys": "all_journeys",
         "final_figure_output": True,
         "year_text": "black",
+        "additional_frames_needed": True
     },
 }
 

@@ -66,8 +66,8 @@ def crop(layer, x_lims, y_lims):
     y_len = lims[3] - lims[1]
 
     layer = layer.cx[
-        lims[0]-(x_len*0.1) : lims[2]+(x_len*0.1),
-        lims[1]-(y_len*0.1) : lims[3]+(y_len*0.1),
+        lims[0] - (x_len * 0.1) : lims[2] + (x_len * 0.1),
+        lims[1] - (y_len * 0.1) : lims[3] + (y_len * 0.1),
     ]
     return layer
 
@@ -1261,217 +1261,194 @@ def make_final_by_year_image(counters, maps_dict, map_configs):
         )
 
 
+def running_recents_additional_frames(journey_plots, map_configs):
+    journey_plots["journey_plots_for_moving_recents"][0].remove()
+    del journey_plots["journey_plots_for_moving_recents"][0]
+
+    if len(journey_plots["journey_plots_for_moving_recents"]) == 0:
+        map_configs["running_recents"]["additional_frames_needed"] = False
+    return journey_plots, map_configs
+
+
+def overall_bubbling_off_additional_frames(journey_plots, map_configs):
+    journey_plots["journey_plots_bubbling"][0].remove()
+    del journey_plots["journey_plots_bubbling"][0]
+    for i in range(len(journey_plots["journey_plots_bubbling"])):
+        journey_plots["journey_plots_bubbling"][i].set_sizes(
+            journey_plots["journey_plots_bubbling"][i]._sizes * 1.2
+        )
+        if journey_plots["journey_plots_bubbling"][i]._alpha > 0.0005:
+            journey_plots["journey_plots_bubbling"][i].set_alpha(
+                journey_plots["journey_plots_bubbling"][i]._alpha * 0.82
+            )
+    if len(journey_plots["journey_plots_bubbling"]) == 0:
+        map_configs["overall_bubbling_off"]["additional_frames_needed"] = False
+    return journey_plots, map_configs
+
+
+def end_points_bubbling_additional_frames(journey_plots, map_configs):
+    journey_plots["end_points_bubbling"][0].remove()
+    del journey_plots["end_points_bubbling"][0]
+    for i in range(len(journey_plots["end_points_bubbling"])):
+        journey_plots["end_points_bubbling"][i].set_sizes(
+            journey_plots["end_points_bubbling"][i]._sizes * 1.1
+        )
+        if journey_plots["end_points_bubbling"][i]._alpha > 0.0005:
+            journey_plots["end_points_bubbling"][i].set_alpha(
+                journey_plots["end_points_bubbling"][i]._alpha * 0.95
+            )
+    if len(journey_plots["end_points_bubbling"]) == 0:
+        map_configs["end_points_bubbling"]["additional_frames_needed"] = False
+    return journey_plots, map_configs
+
+
+def overall_shrinking_additional_frames(journey_plots, map_configs):
+    sizes = [points._sizes for points in journey_plots["journey_plots_shrinking"]]
+    sizes = [size[0] for size in sizes]
+    max_sizes = max(sizes)
+
+    rat = 0.95
+    min_size = 1
+
+    for points in journey_plots["journey_plots_shrinking"]:
+        if points._sizes > min_size:
+            points.set_sizes(points._sizes * 0.95)
+            points.set_alpha(points._alpha * 0.99)
+
+    if all(
+        [
+            points._sizes <= min_size
+            for points in journey_plots["journey_plots_shrinking"]
+        ]
+    ):
+        map_configs["overall_shrinking"]["additional_frames_needed"] = False
+    return journey_plots, map_configs
+
+
+def end_points_shrinking_additional_frames(journey_plots, map_configs):
+    sizes = [points._sizes for points in journey_plots["end_points_shrinking"]]
+    sizes = [size[0] for size in sizes]
+    max_sizes = max(sizes)
+
+    rat = 0.9
+    min_size = 10
+
+    for points in journey_plots["end_points_shrinking"]:
+        if points._sizes > min_size:
+            points.set_sizes(points._sizes * rat)
+            points.set_alpha(points._alpha * 0.985)
+
+    if all(
+        [points._sizes <= min_size for points in journey_plots["end_points_shrinking"]]
+    ):
+        map_configs["end_points_shrinking"]["additional_frames_needed"] = False
+    return journey_plots, map_configs
+
+
 def additional_frames_journeys_fading_out(
     journey_files, maps_dict, journey_plots, counters, map_configs
 ):
-    # Add on some more frames to running_recents, where older journey_files disappear one by one
-    # todo: refactor function
     if making_videos:
-        index = 0
-        if "running_recents" in map_configs.keys():
-            timestr = counters["first_year"] + " - " + journey_files[-1].split("-")[0]
-            # journey_plots_for_moving_recents defined above, and written to in the plotter_moving_recents function
-            number_plots_to_do = len(journey_plots["journey_plots_for_moving_recents"])
-            while len(journey_plots["journey_plots_for_moving_recents"]) > 0:
-                logger.info(
-                    f"HA! Additional figure generation: making additional image {index + 1} of "
-                    f"{number_plots_to_do} for the running_recents video - fading out the old journey_files"
-                )
-                # Remove line from plot and journey_plots_for_moving_recents list
-                journey_plots["journey_plots_for_moving_recents"][0].remove()
-                del journey_plots["journey_plots_for_moving_recents"][0]
-                # Save the images to files
-                if index % image_interval == 0:
-                    filename = os.path.join(
-                        os.path.join(
-                            os.path.join(data_path, "images_for_video"),
-                            "running_recents",
-                        ),
-                        "first_"
-                        + str(counters["n_journeys_plotted"] + index + 1).zfill(4)
-                        + "_journeys.png",
-                    )
-                    maps_dict["running_recents"][0].savefig(
-                        filename,
-                        bbox_inches="tight",
-                    )
-                index += 1
+        # Index for saving result e.g. after every 10 journeys, etc
+        index = 1
 
-    # Add on some more frames to bubbling, where older journey_files disappear one by one
-    if making_videos:
-        index = 0
-        if "overall_bubbling_off" in map_configs.keys():
-            timestr = counters["first_year"] + " - " + journey_files[-1].split("-")[0]
-            # journey_plots_for_moving_recents defined above, and written to in the plotter_moving_recents function
-            number_plots_to_do = len(journey_plots["journey_plots_bubbling"])
+        # Final year should always remain the year of the last journey file - no longer actually plotting new data
+        timestr = counters["first_year"] + " - " + journey_files[-1].split("-")[0]
 
-            while len(journey_plots["journey_plots_bubbling"]) > 0:
-                logger.info(
-                    f"HA! Additional figure generation: making additional image {index + 1} of "
-                    f"{number_plots_to_do} for the bubbling video - fading out the old journey_files"
-                )
-                # Remove line from plot and journey_plots_for_moving_recents list
-                journey_plots["journey_plots_bubbling"][0].remove()
-                del journey_plots["journey_plots_bubbling"][0]
-                for i in range(len(journey_plots["journey_plots_bubbling"])):
-                    journey_plots["journey_plots_bubbling"][i].set_sizes(
-                        journey_plots["journey_plots_bubbling"][i]._sizes * 1.2
-                    )
-                    if journey_plots["journey_plots_bubbling"][i]._alpha > 0.0005:
-                        journey_plots["journey_plots_bubbling"][i].set_alpha(
-                            journey_plots["journey_plots_bubbling"][i]._alpha * 0.82
-                        )
-                # Save the images to files
-                if index % image_interval == 0:
-                    filename = os.path.join(
-                        os.path.join(
-                            os.path.join(data_path, "images_for_video"),
-                            "overall_bubbling_off",
-                        ),
-                        "first_"
-                        + str(counters["n_journeys_plotted"] + index + 1).zfill(4)
-                        + "_journeys.png",
-                    )
-                    maps_dict["overall_bubbling_off"][0].savefig(
-                        filename,
-                        bbox_inches="tight",
-                    )
-                index += 1
-
-    # Add on some more frames to journey_plots['end_points_bubbling'], where older journey_files disappear one by one
-    if making_videos:
-        index = 0
-        if "end_points_bubbling" in map_configs.keys():
-            timestr = counters["first_year"] + " - " + journey_files[-1].split("-")[0]
-            # journey_plots_for_moving_recents defined above, and written to in the plotter_moving_recents function
-            number_plots_to_do = len(journey_plots["end_points_bubbling"])
-
-            while len(journey_plots["end_points_bubbling"]) > 0:
-                logger.info(
-                    f"HA! Additional figure generation: making additional image {index + 1} of "
-                    f"{number_plots_to_do} for the end_points_bubbling video - fading out the old journey_files"
-                )
-                # Remove line from plot and journey_plots_for_moving_recents list
-                journey_plots["end_points_bubbling"][0].remove()
-                del journey_plots["end_points_bubbling"][0]
-                for i in range(len(journey_plots["end_points_bubbling"])):
-                    journey_plots["end_points_bubbling"][i].set_sizes(
-                        journey_plots["end_points_bubbling"][i]._sizes * 1.1
-                    )
-                    if journey_plots["end_points_bubbling"][i]._alpha > 0.0005:
-                        journey_plots["end_points_bubbling"][i].set_alpha(
-                            journey_plots["end_points_bubbling"][i]._alpha * 0.95
-                        )
-                # Save the images to files
-                if index % image_interval == 0:
-                    filename = os.path.join(
-                        os.path.join(
-                            os.path.join(data_path, "images_for_video"),
-                            "end_points_bubbling",
-                        ),
-                        "first_"
-                        + str(counters["n_journeys_plotted"] + index + 1).zfill(4)
-                        + "_journeys.png",
-                    )
-                    maps_dict["end_points_bubbling"][0].savefig(
-                        filename,
-                        bbox_inches="tight",
-                    )
-                index += 1
-
-    # Add on some more frames to shrinking, where older gradually shrink
-    if making_videos:
-        index = 0
-        if "overall_shrinking" in map_configs.keys():
-            timestr = counters["first_year"] + " - " + journey_files[-1].split("-")[0]
-            # journey_plots_for_moving_recents defined above, and written to in the plotter_moving_recents function
-
-            sizes = [
-                points._sizes for points in journey_plots["journey_plots_shrinking"]
-            ]
-            sizes = [size[0] for size in sizes]
-            max_sizes = max(sizes)
-
-            rat = 0.95
-            min_size = 1
-
-            number_plots_to_do = math.ceil(
-                (np.log(min_size) - np.log(max_sizes)) / np.log(rat)
+        # Until we've marked all of these additional frames as finished
+        while (
+            sum(
+                [
+                    map_configs[key]["additional_frames_needed"]
+                    for key in map_configs.keys()
+                ]
             )
+            > 0
+        ):
+            for map_scheme_name in map_configs.keys():
 
-            for i in range(number_plots_to_do):
-                logger.info(
-                    f"HA! Additional figure generation: making additional image {index + 1} of "
-                    f"{number_plots_to_do} for the shrinking video - fading out the old journey_files"
-                )
+                if map_configs[map_scheme_name]["additional_frames_needed"]:
 
-                for points in journey_plots["journey_plots_shrinking"]:
-                    if points._sizes > min_size:
-                        points.set_sizes(points._sizes * 0.95)
-                        points.set_alpha(points._alpha * 0.99)
-
-                # Save the images to files
-                if index % image_interval == 0:
-                    filename = os.path.join(
-                        os.path.join(
-                            os.path.join(data_path, "images_for_video"),
-                            "overall_shrinking",
-                        ),
-                        "first_"
-                        + str(counters["n_journeys_plotted"] + index + 1).zfill(4)
-                        + "_journeys.png",
+                    logger.info(
+                        f"HA! Additional figure generation: to tidy up effects after all journeys are plotted, "
+                        f"frame number {index} for {map_scheme_name}"
                     )
-                    maps_dict["overall_shrinking"][0].savefig(
-                        filename,
-                        bbox_inches="tight",
-                    )
-                index += 1
 
-    # Add on some more frames to journey_plots['end_points_shrinking'], where older gradually shrink
-    if making_videos:
-        index = 0
-        if "end_points_shrinking" in map_configs.keys():
-            timestr = counters["first_year"] + " - " + journey_files[-1].split("-")[0]
-            # journey_plots_for_moving_recents defined above, and written to in the plotter_moving_recents function
-            sizes = [points._sizes for points in journey_plots["end_points_shrinking"]]
-            sizes = [size[0] for size in sizes]
-            max_sizes = max(sizes)
+                    if (
+                        map_scheme_name == "running_recents"
+                        and map_configs["running_recents"]["additional_frames_needed"]
+                    ):
+                        journey_plots, map_configs = running_recents_additional_frames(
+                            journey_plots, map_configs
+                        )
 
-            rat = 0.9
-            min_size = 10
+                    if (
+                        map_scheme_name == "overall_bubbling_off"
+                        and map_configs["overall_bubbling_off"][
+                            "additional_frames_needed"
+                        ]
+                    ):
+                        (
+                            journey_plots,
+                            map_configs,
+                        ) = overall_bubbling_off_additional_frames(
+                            journey_plots, map_configs
+                        )
 
-            number_plots_to_do = math.ceil(
-                (np.log(min_size) - np.log(max_sizes)) / np.log(rat)
-            )
+                    if (
+                        map_scheme_name == "end_points_bubbling"
+                        and map_configs["end_points_bubbling"][
+                            "additional_frames_needed"
+                        ]
+                    ):
+                        (
+                            journey_plots,
+                            map_configs,
+                        ) = end_points_bubbling_additional_frames(
+                            journey_plots, map_configs
+                        )
 
-            for i in range(number_plots_to_do):
-                logger.info(
-                    f"HA! Additional figure generation: making additional image {index + 1} of "
-                    f"{number_plots_to_do} for the end_points_shrinking video - fading out the old journey_files"
-                )
+                    # Add on some more frames to shrinking, where older gradually shrink
+                    if (
+                        map_scheme_name == "overall_shrinking"
+                        and map_configs["overall_shrinking"]["additional_frames_needed"]
+                    ):
+                        (
+                            journey_plots,
+                            map_configs,
+                        ) = overall_shrinking_additional_frames(
+                            journey_plots, map_configs
+                        )
 
+                    if (
+                        map_scheme_name == "end_points_shrinking"
+                        and map_configs["end_points_shrinking"][
+                            "additional_frames_needed"
+                        ]
+                    ):
+                        (
+                            journey_plots,
+                            map_configs,
+                        ) = end_points_shrinking_additional_frames(
+                            journey_plots, map_configs
+                        )
 
-                for points in journey_plots["end_points_shrinking"]:
-                    if points._sizes > min_size:
-                        points.set_sizes(points._sizes * rat)
-                        points.set_alpha(points._alpha * 0.985)
-
-                # Save the images to files
-                if index % image_interval == 0:
-                    filename = os.path.join(
-                        os.path.join(
-                            os.path.join(data_path, "images_for_video"),
-                            "end_points_shrinking",
-                        ),
-                        "first_"
-                        + str(counters["n_journeys_plotted"] + index + 1).zfill(4)
-                        + "_journeys.png",
-                    )
-                    maps_dict["end_points_shrinking"][0].savefig(
-                        filename,
-                        bbox_inches="tight",
-                    )
-                index += 1
+                    # Save the images to files
+                    if index % image_interval == 0:
+                        filename = os.path.join(
+                            os.path.join(
+                                os.path.join(data_path, "images_for_video"),
+                                map_scheme_name,
+                            ),
+                            "first_"
+                            + str(counters["n_journeys_plotted"] + index + 1).zfill(4)
+                            + "_journeys.png",
+                        )
+                        maps_dict[map_scheme_name][0].savefig(
+                            filename,
+                            bbox_inches="tight",
+                        )
+            index += 1
 
 
 def make_all_videos(counters, map_configs):
